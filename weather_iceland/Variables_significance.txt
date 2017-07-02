@@ -1,0 +1,19 @@
+Weather Factor Explanation
+code base stations at IMO
+ar year
+Man Month (1,2, .... 12, and 13 is ársgildið)
+t average temperature 
+tx average maximum temperature
+txx highest temperature measured in the month / year
+txx_dag1 Date of the highest heat / month the highest temperature of the year
+tn The average minimum temperature in the month / year
+TNN lowest temperature measured in the month / year
+tnn_dag1 Date of lowest temperature / month the lowest temperature 
+rh Humidity
+r Total precipitation of the month / year
+rx The highest daily precipitation measured in month / year (measured in time. 09 am)
+rx_dag1 Date maximum daily rainfall / month with a maximum daily precipitation
+Among the air pressure p
+nh average cloud cover in eighths of
+Sun Number sunshine engaged in the month / year
+The average wind speed f
