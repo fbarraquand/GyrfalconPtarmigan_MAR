@@ -1,7 +1,6 @@
 ################################################################################################################
 ################# Analysis Gyrfalcon-Partmigan-Weather data - MAR modelling with MARSS package #################
 ### FBarraquand 26/03/2017, analyses started 06/07/2015, with O. Nielsen #######################################
-### Updated version producing all the figures and results of the paper in a reproducible workflow 25/07/2017 ###
 ################################################################################################################
 
 ### Initializing
@@ -9,18 +8,18 @@ rm(list=ls())
 graphics.off()
 
 ### Reading data on gyr-ptarmigan
-DGP<-read.csv("Gyrfalcon_Data.csv")
+DGP<-read.csv("/home/frederic/Documents/MAR_modelling/Gyr/Gyrfalcon_Data.csv")
 par(mfrow=c(2,1))
 plot(DGP$Year,DGP$Occupied,type="b")
 plot(DGP$Year,DGP$Ptarmigan,type="b")
-## Need to correct the gyr portion for observational effort // number of territories surveyed 
+## Need to correct the gyr portion for observational effort
 DGP$Occupancy=DGP$Occupied/DGP$N
 
 par(mfrow=c(2,1))
 plot(DGP$Year,DGP$Occupancy,type="b",main="Percentage territories occupied Gyrfalcon")
 plot(DGP$Year,DGP$Ptarmigan,type="b",main="Mean density Ptarmigan")
 
-#Plot both densities standardized
+#Plot both standardized
 png(file="GyrPtarDensities.png",width=10,height=8,res=300,units="in")
 DGP$OccStd=(DGP$Occupancy-mean(DGP$Occupancy))/sd(DGP$Occupancy)
 DGP$PtarStd=(DGP$Ptarmigan-mean(DGP$Ptarmigan))/sd(DGP$Ptarmigan)
@@ -29,10 +28,9 @@ plot(DGP$Year,DGP$OccStd,type="b",col="red",ylim=c(-3,3),ylab = "Stdized populat
 lines(DGP$Year,DGP$PtarStd,type="b",lwd=3,pch=20)
 dev.off()
 
-#####################################################################################################
-### Easier to interpret the coefficients once the data is both logged and standardized. Do that now. 
-################# Standardized data analysis ########################################################
-
+##############################################################################################
+### Easier to interpret the coefficients once the data is logged and standardized. Do that now. 
+################# Standardized data analysis ##############################################
 xbis=matrix(0,nrow=2,ncol=nrow(DGP))
 xbis[1,]<-log(DGP$Ptarmigan)#1 is prey
 xbis[2,]<-log(DGP$Occupancy)#2 is predator
@@ -45,21 +43,17 @@ xbis[2,]<-(xbis[2,]-m2)/s2
 growth_rate = xbis[,2:nrow(DGP)]-xbis[,1:(nrow(DGP)-1)]
 x=xbis[,1:(nrow(DGP)-1)]
 
-################# Weather variables #################################################################
+################# Weather variables ##########################################################
 
-### Loading in the weather data 
+### Loading in 
 DB=read.csv("weather_iceland/average_weatherNEiceland.csv",header=T)
-names(DB)[6]="r" #renaming "r" the logRainfall variable
+names(DB)[6]="r" #renaming logRainfall
 ### Years considered for weather
 DGP$Year[1:(nrow(DGP))] # 1981 to 2013, since the last growth rate is arriving in 2014
 
-### Weather data for prey 
-
-### Defining a lagged year
+### Weather data for prey
 year_minus_1=DGP$Year[1:(nrow(DGP))]-1
 ### This is in fact weather of the spring t-1 affecting growth from spring t-1 to spring t 
-
-### --- stopped there --- ###
 
 # Average temperature 1 year earlier in May 
 tempMay_year=DB$temp[(DB$year %in% year_minus_1)&(DB$month==5)]
