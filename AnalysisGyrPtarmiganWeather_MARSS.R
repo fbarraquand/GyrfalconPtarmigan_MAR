@@ -43,7 +43,7 @@ s2=sd(xbis[2,])
 xbis[1,]<-(xbis[1,]-m1)/s1
 xbis[2,]<-(xbis[2,]-m2)/s2
 growth_rate = xbis[,2:nrow(DGP)]-xbis[,1:(nrow(DGP)-1)]
-x=xbis[,1:(nrow(DGP)-1)]
+x=xbis[,1:(nrow(DGP)-1)] ### restricted dataset (not for MARSS, for custom analyses)
 
 ################# Weather variables #################################################################
 
@@ -51,41 +51,54 @@ x=xbis[,1:(nrow(DGP)-1)]
 DB=read.csv("weather_iceland/average_weatherNEiceland.csv",header=T)
 names(DB)[6]="r" #renaming "r" the logRainfall variable
 ### Years considered for weather
-DGP$Year[1:(nrow(DGP))] # 1981 to 2013, since the last growth rate is arriving in 2014
+DGP$Year[1:(nrow(DGP))] # 1981 to 2014, - last growth rate is 2013-2014
 
-### Weather data for prey 
+##################### Weather data for prey ########################
 
 ### Defining a lagged year
 year_minus_1=DGP$Year[1:(nrow(DGP))]-1
-### This is in fact weather of the spring t-1 affecting growth from spring t-1 to spring t 
-
-### --- stopped there --- ###
 
 # Average temperature 1 year earlier in May 
-tempMay_year=DB$temp[(DB$year %in% year_minus_1)&(DB$month==5)]
-# Log-rainfall 1 year earlier in May
-rainMay_year=log(DB$r[(DB$year %in% year_minus_1)&(DB$month==5)])
+tempMay_year_minus1=DB$temp[(DB$year %in% year_minus_1)&(DB$month==5)]
+### This is in fact weather of the spring t-1 affecting growth from spring t-1 to spring t 
 
-### Weather data for predator
+# Average temperature of the year in May 
+# This makes sense because chicks of the previous year survival depend on the year's temperature in the spring. 
+# Using the previous year encapsulate effects of temperature on reproduction and early chick survival
+DGP$Year
+# This is weather of the spring t affecting growth from spring t-1 to spring t (later on in the MAR model)
+tempMay_year=DB$temp[(DB$year %in% DGP$Year)&(DB$month==5)]
+
+# Log-rainfall of the year in May
+rainMay_year=log(DB$r[(DB$year %in% DGP$Year)&(DB$month==5)])
+# Log-rainfall 1 year earlier in May
+rainMay_year_minus1=log(DB$r[(DB$year %in% year_minus_1)&(DB$month==5)])
+
+################## Weather data for predator ###################################
 year_minus_4=DGP$Year[1:(nrow(DGP))]-5 ### if we want the weather four years back affecting gyr growth, 
 ## this is what we have to write because MARSS includes the effects of covariate at the same time as "end" abundance
-### NB: if we don't correct this, there's no effect and this is also something we might want to discuss. 
+## Hence the growth of the predator between 2013 and 2014 depends on weather in 2009 (2009 + 4 = 2013)
+### NB: if we don't correct this, there's no effect and this is also something we might want to discuss.
+## we don't do this correction for the grouse because the life-history differs
 
 # Average temperature 4 years earlier in April
 tempApril_year_minus4=DB$temp[(DB$year %in% year_minus_4)&(DB$month==4)]
 # Log-rainfall 4 years earlier in April
 rainApril_year_minus4=log(DB$r[(DB$year %in% year_minus_4)&(DB$month==4)])
 
-### Standardize all those variables to be able to compare something
+### --- Standardize all those variables to be able to compare something --- ###
 tempMay_year_minus1=(tempMay_year_minus1-mean(tempMay_year_minus1))/sd(tempMay_year_minus1)
+tempMay_year = (tempMay_year-mean(tempMay_year))/sd(tempMay_year)
 tempApril_year_minus4=(tempApril_year_minus4-mean(tempApril_year_minus4))/sd(tempApril_year_minus4)
+
 rainMay_year_minus1=scale(rainMay_year_minus1,scale=TRUE) #tired of writing
+rainMay_year=scale(rainMay_year,scale=TRUE) #tired of writing
 rainApril_year_minus4=scale(rainApril_year_minus4,scale=TRUE)
 
 ################### Now implement the suggestion of Olafur - looking at July's data #######################################
-### If chick survival is a key factor, it has to be July from the year t 
-### (or t-1, but let's start with t, assuming the chicks contribute immediately to pop growth). 
-### This is in fact weather of the spring t-1 affecting growth from spring t-1 to spring t 
+### If chick survival to adulthood is a key factor, it has to be July from the year t-1
+### ----  Note the ptarmigans are counted in spring, that is, in May and early June. 
+### Makes therefore no sense to look at how ptarmigan growth from May_{t-1} to May_t is affected by June_t or July_t
 
 ### Creating new weather variables
 tempJuly_year=DB$temp[(DB$year %in% year_minus_1)&(DB$month==7)]
@@ -98,11 +111,10 @@ rainJune_year=log(DB$r[(DB$year %in% year_minus_1)&(DB$month==6)])
 ### Scale these
 tempJune_year=scale(tempJune_year)
 tempJuly_year=scale(tempJuly_year)
-tempMay_year=scale(tempMay_year)
+
 ## rainfall
 rainJune_year=scale(rainJune_year)
 rainJuly_year=scale(rainJuly_year)
-rainMay_year=scale(rainMay_year)
 
 
 ### Winter weather now ################################
@@ -143,7 +155,7 @@ log_winter_rain = scale(log_winter_rain)
 plot(log_winter_rain,type="o")
 
 
-#################
+################# Estimation of MAR models #############################################
 
 ### Estimation with MARSS package
 library('MARSS')
@@ -213,6 +225,8 @@ MARSSparamCIs(mar1.temp.only)
 
 ### Delay one more year for ptarmigan. 
 ### to do? mar1.temp1
+
+### -- stopped there --- ### 
 
 ### Now a model with rainfall
 covar=t(as.matrix(cbind(rainMay_year,rainApril_year_minus4)))
