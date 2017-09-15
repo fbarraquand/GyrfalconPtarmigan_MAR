@@ -181,7 +181,7 @@ Q1="diagonal and unequal"
 data<-xbis
 model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
 mar1.full=MARSS(data, model=model.list)
-MARSSparamCIs(mar1.full)
+CIs.mar1.full=MARSSparamCIs(mar1.full)
 
 ### Now include the same full model but with a correlated noise matrix
 Q1=matrix(c("q11","q21","q12","q22"),2,2) ##assume correlated noise
@@ -197,7 +197,7 @@ B1=matrix(list("b11",0,0,"b22"),2,2,byrow = T) ### Interaction matrix
 U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
 model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
 mar1.null=MARSS(data, model=model.list)
-MARSSparamCIs(mar1.null)
+CIs.mar1.null=MARSSparamCIs(mar1.null)
 
 ### Diagnostics
 mar1.null$logLik
@@ -212,7 +212,65 @@ Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 mar1.temp=MARSS(data, model=model.list)
-MARSSparamCIs(mar1.temp)
+CIs.mar1.temp=MARSSparamCIs(mar1.temp)
+
+####### Storage of interaction matrices B and environmental matrices C ################
+
+# Storage full model
+value=mar1.full$par$B#value=CIs.mar1.full$par$B
+SE=CIs.mar1.full$par.se$B
+lower=CIs.mar1.full$par.lowCI$B
+upper=CIs.mar1.full$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.full$par$U ### C is U
+SE=CIs.mar1.full$par.se$U
+lower=CIs.mar1.full$par.lowCI$U
+upper=CIs.mar1.full$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.full$par$Q ### C is U
+SE=CIs.mar1.full$par.se$Q
+lower=CIs.mar1.full$par.lowCI$Q
+upper=CIs.mar1.full$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.full.csv")
+
+mar1.null$par$B
+#Storage null model
+value=mar1.null$par$B#value=CIs.mar1.null$par$B
+SE=CIs.mar1.null$par.se$B
+lower=CIs.mar1.null$par.lowCI$B
+upper=CIs.mar1.null$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.null$par$U
+SE=CIs.mar1.null$par.se$U
+lower=CIs.mar1.null$par.lowCI$U
+upper=CIs.mar1.null$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.null$par$Q
+SE=CIs.mar1.null$par.se$Q
+lower=CIs.mar1.null$par.lowCI$Q
+upper=CIs.mar1.null$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.null.csv")
+
+mar1.temp$par$B
+#Storage full model with effect of temperature
+value=mar1.temp$par$B#value=CIs.mar1.temp$par$B
+SE=CIs.mar1.temp$par.se$B
+lower=CIs.mar1.temp$par.lowCI$B
+upper=CIs.mar1.temp$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.temp$par$U
+SE=CIs.mar1.temp$par.se$U
+lower=CIs.mar1.temp$par.lowCI$U
+upper=CIs.mar1.temp$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.temp$par$Q
+SE=CIs.mar1.temp$par.se$Q
+lower=CIs.mar1.temp$par.lowCI$Q
+upper=CIs.mar1.temp$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.temp.csv")
 
 covar=t(as.matrix(cbind(tempMay_year,tempApril_year_minus4)))
 C1=matrix(c("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
@@ -220,13 +278,54 @@ C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11",0,0,"b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
-mar1.temp=MARSS(data, model=model.list)
-MARSSparamCIs(mar1.temp.only)
+mar1.temp.only=MARSS(data, model=model.list)
+CIs.mar1.temp.only=MARSSparamCIs(mar1.temp.only)
 
-### Delay one more year for ptarmigan. 
-### to do? mar1.temp1
+value=mar1.temp.only$par$B#value=CIs.mar1.temp.only$par$B
+SE=CIs.mar1.temp.only$par.se$B
+lower=CIs.mar1.temp.only$par.lowCI$B
+upper=CIs.mar1.temp.only$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.temp.only$par$U
+SE=CIs.mar1.temp.only$par.se$U
+lower=CIs.mar1.temp.only$par.lowCI$U
+upper=CIs.mar1.temp.only$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.temp.only$par$Q
+SE=CIs.mar1.temp.only$par.se$Q
+lower=CIs.mar1.temp.only$par.lowCI$Q
+upper=CIs.mar1.temp.only$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.temp.only.csv")
 
-### -- stopped there --- ### 
+
+### Delay one more year the temperature for ptarmigan. 
+covar=t(as.matrix(cbind(tempMay_year_minus1,tempApril_year_minus4)))
+C1=matrix(c("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
+C1
+Q1="diagonal and unequal"
+B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
+model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
+mar1.temp1=MARSS(data, model=model.list)
+CIs.mar1.temp1=MARSSparamCIs(mar1.temp1)
+
+#Storage full model with effect of temperature one year delayed
+value=mar1.temp1$par$B#value=CIs.mar1.temp1$par$B
+SE=CIs.mar1.temp1$par.se$B
+lower=CIs.mar1.temp1$par.lowCI$B
+upper=CIs.mar1.temp1$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.temp1$par$U
+SE=CIs.mar1.temp1$par.se$U
+lower=CIs.mar1.temp1$par.lowCI$U
+upper=CIs.mar1.temp1$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.temp1$par$Q
+SE=CIs.mar1.temp1$par.se$Q
+lower=CIs.mar1.temp1$par.lowCI$Q
+upper=CIs.mar1.temp1$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.temp1.csv")
 
 ### Now a model with rainfall
 covar=t(as.matrix(cbind(rainMay_year,rainApril_year_minus4)))
@@ -239,6 +338,24 @@ mar1.rain=MARSS(data, model=model.list)
 MARSSparamCIs(mar1.rain)
 # No effect. 
 
+#Storage full model with effect of (cumulated) rainfall
+value=mar1.rain$par$B#value=CIs.mar1.rain$par$B
+SE=CIs.mar1.rain$par.se$B
+lower=CIs.mar1.rain$par.lowCI$B
+upper=CIs.mar1.rain$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.rain$par$U
+SE=CIs.mar1.rain$par.se$U
+lower=CIs.mar1.rain$par.lowCI$U
+upper=CIs.mar1.rain$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.rain$par$Q
+SE=CIs.mar1.rain$par.se$Q
+lower=CIs.mar1.rain$par.lowCI$Q
+upper=CIs.mar1.rain$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.rain.csv")
+
 ### With temperature + rainfall
 covar=t(as.matrix(cbind(tempMay_year,rainMay_year,tempApril_year_minus4,rainApril_year_minus4)))
 C1=matrix(c("tempMay_year","rainMay_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
@@ -247,8 +364,90 @@ Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 mar1.both=MARSS(data, model=model.list)
-MARSSparamCIs(mar1.both)
+CIs.mar1.both=MARSSparamCIs(mar1.both)
 mar1.both
+
+value=mar1.both$par$B#value=CIs.mar1.both$par$B
+SE=CIs.mar1.both$par.se$B
+lower=CIs.mar1.both$par.lowCI$B
+upper=CIs.mar1.both$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.both$par$U
+SE=CIs.mar1.both$par.se$U
+lower=CIs.mar1.both$par.lowCI$U
+upper=CIs.mar1.both$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.both$par$Q
+SE=CIs.mar1.both$par.se$Q
+lower=CIs.mar1.both$par.lowCI$Q
+upper=CIs.mar1.both$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.both.csv")
+
+### First comparison of AICc/BIC for all models 
+mar.bic <- function(my.mar)
+{
+  my.mar$BIC=0  
+  my.mar$BIC=-2*my.mar$logLik + my.mar$num.params*log(my.mar$samp.size/2)
+}
+
+mar.list=list(mar1.null=mar1.null,mar1.full=mar1.full,mar1.temp=mar1.temp,mar1.temp.only=mar1.temp.only,mar1.temp1=mar1.temp1,mar1.rain=mar1.rain,mar1.both=mar1.both)
+names(mar.list[1]) #check
+
+for (k in 1:length(mar.list)){
+  mar.model=mar.list[k]$AIC
+  mar.model$BIC=mar.bic(mar.model)
+  aic.table.temp=data.frame(mar.model$logLik,mar.model$AIC,mar.model$AICc,mar.model$BIC)
+  if (k==1){
+    aic.table=aic.table.temp
+  } else {
+    aic.table=rbind(aic.table,aic.table.temp)
+  }
+}
+### Can't make that f*** loop work -- mar.model$AIC undefined
+
+## Initialize
+mar1.null$BIC=mar.bic(mar1.null)
+aic.table=data.frame(mar1.null$logLik,mar1.null$AIC,mar1.null$AICc,mar1.null$BIC)
+names(aic.table)=c("logLik","AIC","AICc","BIC")
+
+mar1.full$BIC=mar.bic(mar1.full)
+aic.table.temp=data.frame(mar1.full$logLik,mar1.full$AIC,mar1.full$AICc,mar1.full$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+mar1.temp$BIC=mar.bic(mar1.temp)
+aic.table.temp=data.frame(mar1.temp$logLik,mar1.temp$AIC,mar1.temp$AICc,mar1.temp$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+mar1.temp.only$BIC=mar.bic(mar1.temp.only)
+aic.table.temp=data.frame(mar1.temp.only$logLik,mar1.temp.only$AIC,mar1.temp.only$AICc,mar1.temp.only$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+mar1.temp1$BIC=mar.bic(mar1.temp1)
+aic.table.temp=data.frame(mar1.temp1$logLik,mar1.temp1$AIC,mar1.temp1$AICc,mar1.temp1$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+mar1.rain$BIC=mar.bic(mar1.rain)
+aic.table.temp=data.frame(mar1.rain$logLik,mar1.rain$AIC,mar1.rain$AICc,mar1.rain$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+mar1.both$BIC=mar.bic(mar1.both)
+aic.table.temp=data.frame(mar1.both$logLik,mar1.both$AIC,mar1.both$AICc,mar1.both$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+rownames(aic.table)=c("mar1.null","mar1.full","mar1.temp","mar1.temp.only","mar1.temp1","mar1.rain","mar1.both")
+
+### AIC table shows the full model is better -- did we find that earlier? 
+aic.table
+write.csv(aic.table,file="mar1/aic.table.csv")
+
+### -- stopped there --- ### 
 
 #############################################################
 ### Alternate models with June and July weather to check
