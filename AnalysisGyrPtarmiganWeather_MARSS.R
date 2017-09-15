@@ -206,7 +206,8 @@ mar1.null$AICc
 
 ### Now include a model with temperature covariates
 covar=t(as.matrix(cbind(tempMay_year,tempApril_year_minus4)))
-C1=matrix(c("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
+## C1=matrix(c("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T) ## creates problems
+C1=matrix(list("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
@@ -273,7 +274,7 @@ mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
 write.csv(mar1.data,file="mar1/mar1.temp.csv")
 
 covar=t(as.matrix(cbind(tempMay_year,tempApril_year_minus4)))
-C1=matrix(c("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
+C1=matrix(list("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11",0,0,"b22"),2,2,byrow = T) ### Interaction matrix
@@ -301,7 +302,7 @@ write.csv(mar1.data,file="mar1/mar1.temp.only.csv")
 
 ### Delay one more year the temperature for ptarmigan. 
 covar=t(as.matrix(cbind(tempMay_year_minus1,tempApril_year_minus4)))
-C1=matrix(c("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
+C1=matrix(list("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
@@ -329,7 +330,7 @@ write.csv(mar1.data,file="mar1/mar1.temp1.csv")
 
 ### Now a model with rainfall
 covar=t(as.matrix(cbind(rainMay_year,rainApril_year_minus4)))
-C1=matrix(c("rainMay_year",0,0,"rainApril_year_minus4"),2,2,byrow=T)
+C1=matrix(list("rainMay_year",0,0,"rainApril_year_minus4"),2,2,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
@@ -358,7 +359,7 @@ write.csv(mar1.data,file="mar1/mar1.rain.csv")
 
 ### With temperature + rainfall
 covar=t(as.matrix(cbind(tempMay_year,rainMay_year,tempApril_year_minus4,rainApril_year_minus4)))
-C1=matrix(c("tempMay_year","rainMay_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
+C1=matrix(list("tempMay_year","rainMay_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
@@ -443,9 +444,10 @@ aic.table=rbind(aic.table,aic.table.temp)
 
 rownames(aic.table)=c("mar1.null","mar1.full","mar1.temp","mar1.temp.only","mar1.temp1","mar1.rain","mar1.both")
 
-### AIC table shows the full model is better -- did we find that earlier? 
+### AIC table shows the full model is better -- did we find that earlier? Not by much though
 aic.table
 write.csv(aic.table,file="mar1/aic.table.csv")
+### we keep in the set of nest models mar1.full, mar1.temp and mar1.temp1
 
 ### -- stopped there --- ### 
 
