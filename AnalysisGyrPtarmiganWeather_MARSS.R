@@ -459,7 +459,7 @@ Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 mar1.both.june=MARSS(data, model=model.list)
-MARSSparamCIs(mar1.both.june)
+CIs.mar1.both.june=MARSSparamCIs(mar1.both.june)
 
 covar=t(as.matrix(cbind(tempJuly_year,rainJuly_year,tempApril_year_minus4,rainApril_year_minus4)))
 C1=matrix(c("tempJuly_year","rainJuly_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
@@ -468,7 +468,7 @@ Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 mar1.both.july=MARSS(data, model=model.list)
-MARSSparamCIs(mar1.both.july)
+CIs.mar1.both.july=MARSSparamCIs(mar1.both.july)
 
 #############################################################
 ### Alternate models with winter weather to check
