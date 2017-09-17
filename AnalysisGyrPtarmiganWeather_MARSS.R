@@ -447,15 +447,13 @@ rownames(aic.table)=c("mar1.null","mar1.full","mar1.temp","mar1.temp.only","mar1
 ### AIC table shows the full model is better -- did we find that earlier? Not by much though
 aic.table
 write.csv(aic.table,file="mar1/aic.table.csv")
-### we keep in the set of nest models mar1.full, mar1.temp and mar1.temp1
-
-### -- stopped there --- ### 
+### we keep in the set of nested models mar1.full, mar1.temp and mar1.temp1
 
 #############################################################
 ### Alternate models with June and July weather to check
 ##############################################################
 covar=t(as.matrix(cbind(tempJune_year,rainJune_year,tempApril_year_minus4,rainApril_year_minus4)))
-C1=matrix(c("tempJune_year","rainJune_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
+C1=matrix(list("tempJune_year","rainJune_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
@@ -463,14 +461,67 @@ model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0
 mar1.both.june=MARSS(data, model=model.list)
 CIs.mar1.both.june=MARSSparamCIs(mar1.both.june)
 
+### Store model with June temperature
+value=mar1.both.june$par$B
+SE=CIs.mar1.both.june$par.se$B
+lower=CIs.mar1.both.june$par.lowCI$B
+upper=CIs.mar1.both.june$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.both.june$par$U
+SE=CIs.mar1.both.june$par.se$U
+lower=CIs.mar1.both.june$par.lowCI$U
+upper=CIs.mar1.both.june$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.both.june$par$Q
+SE=CIs.mar1.both.june$par.se$Q
+lower=CIs.mar1.both.june$par.lowCI$Q
+upper=CIs.mar1.both.june$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.both.june.csv")
+
 covar=t(as.matrix(cbind(tempJuly_year,rainJuly_year,tempApril_year_minus4,rainApril_year_minus4)))
-C1=matrix(c("tempJuly_year","rainJuly_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
+C1=matrix(list("tempJuly_year","rainJuly_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 mar1.both.july=MARSS(data, model=model.list)
 CIs.mar1.both.july=MARSSparamCIs(mar1.both.july)
+
+value=mar1.both.july$par$B
+SE=CIs.mar1.both.july$par.se$B
+lower=CIs.mar1.both.july$par.lowCI$B
+upper=CIs.mar1.both.july$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.both.july$par$U
+SE=CIs.mar1.both.july$par.se$U
+lower=CIs.mar1.both.july$par.lowCI$U
+upper=CIs.mar1.both.july$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.both.july$par$Q
+SE=CIs.mar1.both.july$par.se$Q
+lower=CIs.mar1.both.july$par.lowCI$Q
+upper=CIs.mar1.both.july$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar1/mar1.both.july.csv")
+
+nrow(aic.table) ## How many models have we now
+
+mar1.both.july$BIC=mar.bic(mar1.both.july)
+aic.table.temp=data.frame(mar1.both.july$logLik,mar1.both.july$AIC,mar1.both.july$AICc,mar1.both.july$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+mar1.both.june$BIC=mar.bic(mar1.both.june)
+aic.table.temp=data.frame(mar1.both.june$logLik,mar1.both.june$AIC,mar1.both.june$AICc,mar1.both.june$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+aic.table[8:9,]
+rownames(aic.table)[8:9]=c("mar1.both.july","mar1.both.june")
+write.csv(aic.table,file="mar1/aic.table.csv")
+
+### -- stopped there --- ### 
 
 #############################################################
 ### Alternate models with winter weather to check
@@ -482,16 +533,25 @@ CIs.mar1.both.july=MARSSparamCIs(mar1.both.july)
 #log_winter_rain
 
 covar=t(as.matrix(cbind(avMonthly_tempWinter,log_winter_rain,tempApril_year_minus4,rainApril_year_minus4)))
-C1=matrix(c("avMonthly_tempWinter","log_winter_rain",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
+C1=matrix(list("avMonthly_tempWinter","log_winter_rain",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
-mar1.both.winter=MARSS(data, model=model.list)
+### Stronger controls to check the warnings
+iter_min=100 # a minimum of 100 iterations
+cntl.list=list(conv.test.slope.tol=0.001,minit=iter_min,maxit=500,abstol=0.001,trace=1,safe=T)
+#,MCInit=TRUE,silent=2)#,numInits=iter_estimate,numInitSteps=10) 
+#Took values from Griffiths for minit,maxit,abstol. 
+# conv.test.slope is recommended in MARSS User Guide itself, 
+# numInits and numInitStep are taken as rules of thumbs 
+#(quick search on the Internet, numInits=500 elsewhere but it seems really big to me
+mar1.both.winter=MARSS(data, model=model.list,control=cntl.list)
 MARSSparamCIs(mar1.both.winter)
+mar1.both.winter$AICc
 
 covar=t(as.matrix(cbind(avMonthly_tempWinter,log_winter_rain,tempApril_year_minus4,rainApril_year_minus4)))
-C1=matrix(c("minOfMonths_tempWinter","log_winter_rain",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
+C1=matrix(list("minOfMonths_tempWinter","log_winter_rain",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
 C1
 Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
@@ -563,6 +623,7 @@ Q
 
 ### Model call
 model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+### 
 mar2.full=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags)
 # we don't use stacked_data here, just the abundance data that is "observed at t"
 
