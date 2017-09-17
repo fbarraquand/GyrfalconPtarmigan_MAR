@@ -558,7 +558,6 @@ mar1.both.winter2=MARSS(data, model=model.list)
 MARSSparamCIs(mar1.both.winter2)
 
 #### Check again those models
-### -- stopped there --- ### 
 
 #################################################################################################################
 # Now considering MAR(2) models -- what if prey has an impact on the predator but not the other way around ? 
@@ -893,6 +892,19 @@ var_order_select=VARselect(y=data.frame(t(xbis)), type="none",lag.max=5)
 var_order_select
 
 ### The AIC selects 3 lags and the BIC and HQ, that are more conservative, two lags. 
+
+### Does this fit sees causality in the 2x2 model?
+
+######## MAR(2) model #################
+varpp2<-VAR(y=data.frame(t(xbis)), p=2, type="none")
+causality(varpp2,cause="X2") ## No effect of X2 on X1
+causality(varpp2,cause="X1") ## close to reject the hypothesis of non-GC
+
+######## MAR(1) model ################# 
+varpp1<-VAR(y=data.frame(t(xbis)), p=1, type="none") 
+causality(varpp1,cause="X2") ## No effect of X2 on X1
+causality(varpp1,cause="X1")
+# Looks better for causality but that's not the model that's selected... 
 #######################################################################################################
 
 #####################################################################################
@@ -900,6 +912,128 @@ var_order_select
 ####################################################################################
 
 ###### 1. Can we get the right cross-correlation patterns with the best-fitting models? 
+
+# Output the cross-correlation pattern for the data
+
+# Simulations of the fitted models 
+
+# --- old code to improve --- #
+
+################ Simulations of our fitted models ##################################################
+#### Full MAR(2) model
+z=matrix(0,nrow=2,ncol=nrow(DGP))
+z[,1]=runif(2,0,1)
+z[,2]=runif(2,0,1)
+z
+n=nrow(DGP)
+for (t in 2:(n-1)){
+  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
+  z[1,t+1] = a_11_l1*z[1,t] + a_12_l1*z[2,t] + a_11_l2*z[1,t-1] + a_12_l2*z[2,t-1]+eps[1]
+  z[2,t+1] = a_21_l1*z[1,t] + a_22_l1*z[2,t] + a_21_l2*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
+}
+matplot(t(z))
+matlines(t(z))
+
+### Not that bad...
+### Often species 2 follows species 1, as in the data. 
+
+### Now let's set to zero these non-significant coeff to understand what's going on
+for (t in 2:(n-1)){
+  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
+  z[1,t+1] = a_11_l1*z[1,t] + 0*z[2,t] + a_11_l2*z[1,t-1] + 0*z[2,t-1]+eps[1]
+  z[2,t+1] = a_21_l1*z[1,t] + a_22_l1*z[2,t] + 0*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
+}
+matplot(t(z))
+matlines(t(z))
+### A little less realistic, clearly
+
+### Two separate AR(2) models
+for (t in 2:(n-1)){
+  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
+  z[1,t+1] = a_11_l1*z[1,t] + 0*z[2,t] + a_11_l2*z[1,t-1] + 0*z[2,t-1]+eps[1]
+  z[2,t+1] = 0*z[1,t] + a_22_l1*z[2,t] + 0*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
+}
+matplot(t(z))
+matlines(t(z))
+
+### Keep the delayed effect of the predator on the prey even though non-significant
+for (t in 2:(n-1)){
+  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
+  z[1,t+1] = a_11_l1*z[1,t] + 0*z[2,t] + a_11_l2*z[1,t-1] + a_12_l2*z[2,t-1]+eps[1]
+  z[2,t+1] = 0*z[1,t] + a_22_l1*z[2,t] + 0*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
+}
+matplot(t(z))
+matlines(t(z)) # not enough
+
+### Keep the delayed effect of the prey on the predator even though non-significant
+### With the prey that is internally driven as an AR(2) model. 
+for (t in 2:(n-1)){
+  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
+  z[1,t+1] = a_11_l1*z[1,t] + 0*z[2,t] + a_11_l2*z[1,t-1] + 0*z[2,t-1]+eps[1]
+  z[2,t+1] = 0*z[1,t] + a_22_l1*z[2,t] + a_21_l2*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
+}
+matplot(t(z))
+matlines(t(z))
+
+
+# ----------------------------#
+
+
+# Cross-correlations for simulations under the fitted models 
+
+####### ---- Code to UPDATE --- #####
+## Noise 
+Sigma = Diagonal(2, x = c(0.67,0.66)) ## Less variability on 
+pdf("Simulated_MAR_dynamics_stdized.pdf",height=28,width=14)
+par(mfrow=c(4,2))#,cex=1.5
+plot(1:t_max,xbis[1,],type="o",col="black",ylim=c(-3,3),ylab="Real data")#ylim=c(-3,3)
+lines(1:t_max,xbis[2,],type="o",col="red")
+ccf(x[1,],x[2,],ylab = "cross-correlation")
+for(nrep in 1:7)
+{
+  ### Initial values
+  x[,1]=c(-0.8,-1.8)
+  for (t in 1:(t_max-1))
+  {
+    epsilon=mvrnorm(n = 1, mu, Sigma)
+    x[,t+1]=B %*% x[,t] + epsilon
+  }
+  
+  #plot(1:t_max,x[1,],type="b",col="black",ylim=c(-3,3),ylab="Unstandardized log densities")
+  #lines(1:t_max,x[2,],type="b",col="red")
+  # 
+  
+  plot(1:t_max,x[1,],type="o",col="black",ylab="(log(N)-mean)/SD",ylim=c(-3,3),main=paste("Simulation",nrep))
+  lines(1:t_max,x[2,],type="o",col="red")
+  ccf(x[1,],x[2,],ylab = "cross-correlation")
+}
+dev.off()
+
+###
+
+### Simulated phase-planes
+Sigma = Diagonal(2, x = c(0.67,0.66)) ## Less variability on 
+pdf("Simulated_PhasePlane_stdized.pdf",height=28,width=14)
+par(mfrow=c(4,2))#,cex=1.5
+plot(xbis[1,],xbis[2,],type="o",col="black",ylab="Predator",xlab="Prey",main="Real data")
+arrows(xbis[1,1:33],xbis[2,1:33],xbis[1,2:34],xbis[2,2:34],length = 0.2)
+#lines(1:t_max,xbis[2,],type="o",col="red")
+ccf(x[1,],x[2,],ylab = "cross-correlation")
+for(nrep in 1:7)
+{
+  ### Initial values
+  x[,1]=c(-0.8,-1.8)
+  for (t in 1:(t_max-1))
+  {
+    epsilon=mvrnorm(n = 1, mu, Sigma)
+    x[,t+1]=B %*% x[,t] + epsilon
+  }
+  
+  plot(x[1,],x[2,],type="o",col="black",ylab="Predator",xlab="Prey",main=paste("Simulation",nrep))
+  arrows(x[1,1:(t_max-1)],x[2,1:(t_max-1)],x[1,2:t_max],x[2,2:t_max],length = 0.2)
+  ccf(x[1,],x[2,],ylab = "cross-correlation")
+}
+dev.off()
 
 ###### 2. Can the models be correctly identified - given the time series length? 
 
