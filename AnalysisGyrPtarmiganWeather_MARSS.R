@@ -521,8 +521,6 @@ aic.table[8:9,]
 rownames(aic.table)[8:9]=c("mar1.both.july","mar1.both.june")
 write.csv(aic.table,file="mar1/aic.table.csv")
 
-### -- stopped there --- ### 
-
 #############################################################
 ### Alternate models with winter weather to check
 ##############################################################
@@ -560,7 +558,7 @@ mar1.both.winter2=MARSS(data, model=model.list)
 MARSSparamCIs(mar1.both.winter2)
 
 #### Check again those models
-
+### -- stopped there --- ### 
 
 #################################################################################################################
 # Now considering MAR(2) models -- what if prey has an impact on the predator but not the other way around ? 
@@ -625,7 +623,27 @@ Q
 model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
 ### 
 mar2.full=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags)
+CIs.mar2.full=MARSSparamCIs(mar2.full)
 # we don't use stacked_data here, just the abundance data that is "observed at t"
+
+### Store data
+value=mar2.full$par$B
+SE=CIs.mar2.full$par.se$B
+lower=CIs.mar2.full$par.lowCI$B
+upper=CIs.mar2.full$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar2.full$par$U
+SE=CIs.mar2.full$par.se$U
+lower=CIs.mar2.full$par.lowCI$U
+upper=CIs.mar2.full$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar2.full$par$Q
+SE=CIs.mar2.full$par.se$Q
+lower=CIs.mar2.full$par.lowCI$Q
+upper=CIs.mar2.full$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar2/mar2.full.csv")
+
 
 #### Bottom-up model that we highlighted before -- with an effect of prey on predator growth the next year. 
 ### Interaction matrix
@@ -637,6 +655,25 @@ B
 
 model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
 mar2.bottom.up=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags)
+CIs.mar2.bottom.up=MARSSparamCIs(mar2.bottom.up)
+
+### Store data
+value=mar2.bottom.up$par$B
+SE=CIs.mar2.bottom.up$par.se$B
+lower=CIs.mar2.bottom.up$par.lowCI$B
+upper=CIs.mar2.bottom.up$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar2.bottom.up$par$U
+SE=CIs.mar2.bottom.up$par.se$U
+lower=CIs.mar2.bottom.up$par.lowCI$U
+upper=CIs.mar2.bottom.up$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar2.bottom.up$par$Q
+SE=CIs.mar2.bottom.up$par.se$Q
+lower=CIs.mar2.bottom.up$par.lowCI$Q
+upper=CIs.mar2.bottom.up$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar2/mar2.bottom.up.csv")
 
 ### Independent AR(2) models
 B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
@@ -648,6 +685,25 @@ B
 model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
 mar2.indep=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags)
 MARSSparamCIs(mar2.indep)
+CIs.mar2.indep=MARSSparamCIs(mar2.indep)
+
+### Store data
+value=mar2.indep$par$B
+SE=CIs.mar2.indep$par.se$B
+lower=CIs.mar2.indep$par.lowCI$B
+upper=CIs.mar2.indep$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar2.indep$par$U
+SE=CIs.mar2.indep$par.se$U
+lower=CIs.mar2.indep$par.lowCI$U
+upper=CIs.mar2.indep$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar2.indep$par$Q
+SE=CIs.mar2.indep$par.se$Q
+lower=CIs.mar2.indep$par.lowCI$Q
+upper=CIs.mar2.indep$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(mar1.data,file="mar2/mar2.indep.csv")
 
 ################### Full MAR(1) with same number of data points // TS length affects AIC ##################
 ### State-space, observation part - never changes 
@@ -667,8 +723,8 @@ Q1="diagonal and unequal"
 # Estimation
 data<-xbis
 model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
-mar1.full=MARSS(xbis[,2:nrow(DGP)], model=model.list)
-MARSSparamCIs(mar1.full) ### AIC 140, AICc 142, less of a difference... 
+mar1.full.bis=MARSS(xbis[,2:nrow(DGP)], model=model.list)
+MARSSparamCIs(mar1.full.bis) ### AIC 140, AICc 142, less of a difference... 
 ### But still 10 AIC points. I need to check what the BIC might be saying. 
 
 ### Keep on going there. 
@@ -676,63 +732,16 @@ MARSSparamCIs(mar1.full) ### AIC 140, AICc 142, less of a difference...
 B1=matrix(list("b11",0,0,"b22"),2,2,byrow = T) ### Interaction matrix
 U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
 model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
-mar1.null=MARSS(xbis[,2:nrow(DGP)], model=model.list)
-MARSSparamCIs(mar1.null)
+mar1.null.bis=MARSS(xbis[,2:nrow(DGP)], model=model.list)
+MARSSparamCIs(mar1.null.bis)
 
-
-###### Compare fit of models
-mar2.full$AICc
-mar2.bottom.up$AICc
-mar2.indep$AICc 
-mar1.full$AICc
-mar1.null$AICc #even higher, how is it possible when compared to VAR? 
-
-mar2.full$AIC
-mar2.bottom.up$AIC
-mar2.indep$AIC 
-mar1.full$AIC
-mar1.null$AIC
-### They are quite close to each other. 
-### These are clearly below -- well, that's annoying... 
-T=33
-BIC=AIC-2*kparam+kparam*log(T)
-
-MARSSaic(mar2.full, output = "AICbp") ### AIC: 129.5646   AICc: 133.5646   AICbp(param): 143.6595 
-MARSSaic(mar2.bottom.up, output = "AICbp") ### AIC: 129.8294   AICc: 131.7604   AICbp(param): 137.406   
-MARSSaic(mar2.indep,output = "AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 133.7121   
-MARSSaic(mar1.full,output = "AICbp") ### AIC: 140.8294   AICc: 142.2531   AICbp(param): 148.7717   
-MARSSaic(mar1.null,output = "AICbp") ### AIC: 143.1355   AICc: 143.7913   AICbp(param): 147.0655   
-MARSSaic(mar2.indep.temp,output="AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 134.6404   
-
-mar.bic <- function(my.mar)
-{
- my.mar$BIC=0  
- my.mar$BIC=-2*my.mar$logLik + my.mar$num.params*log(my.mar$samp.size/2)
-}
-
-mar2.full$BIC=mar.bic(mar2.full)
-mar2.bottom.up$BIC=mar.bic(mar2.bottom.up) 
-mar2.indep$BIC = mar.bic(mar2.indep) 
-mar1.full$BIC = mar.bic(mar1.full)
-mar1.null$BIC = mar.bic(mar1.null)
-
-# > mar2.full$BIC
-# [1] 144.5297
-# > mar2.bottom.up$BIC
-# [1] 140.3049
-# > mar2.indep$BIC 
-# [1] 138.5429
-# > mar1.full$BIC
-# [1] 149.8084
-# > mar1.null$BIC
-# [1] 149.1216
 
 #########################################################################################
 ######################### MAR(2) models with weather covariates #########################
 #########################################################################################
 ### Let's add some weather on those 
 covar=t(as.matrix(cbind(tempMay_year[2:34],tempApril_year_minus4[2:34])))
-C1=matrix(c("tempMay_year",0,0,"tempApril_year_minus4",0,0,0,0),4,2,byrow=T)
+C1=matrix(list("tempMay_year",0,0,"tempApril_year_minus4",0,0,0,0),4,2,byrow=T)
 C1
 ### Initial values
 V=matrix(0,4,4)
@@ -743,29 +752,7 @@ mar2.indep.temp=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags) #,MCInit=TRUE
 
 ######## Try some other model fitting
 mar2.indep.temp=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags,method="BFGS") 
-# MARSSkfas returned error.  Trying MARSSkfss.
-# Success! Converged in 163 iterations.
-# Function MARSSkfss used for likelihood calculation.
-# 
-# MARSS fit is
-# Estimation method: BFGS 
-# Estimation converged in 163 iterations. 
-# Log-likelihood: -56.31071 
-# AIC: 130.6214   AICc: 133.8357   
-# 
-# Estimate
-# B.b11_1                   1.0882
-# B.b22_1                   0.7129
-# B.b11_2                  -0.4579
-# B.b22_2                  -0.0828
-# Q.q11                     0.3298
-# Q.q22                     0.3510
-# C.tempMay_year           -0.0329
-# C.0                       0.0813
-# C.tempApril_year_minus4   0.1979
-# 
-# Standard errors have not been calculated. 
-# Use MARSSparamCIs to compute CIs and bias estimates.
+
 MARSSparamCIs(mar2.indep.temp)
 MARSSaic(mar2.indep.temp, output = "AICbp")
 # AICbp calculation in progress...
@@ -803,10 +790,73 @@ MARSSaic(mar2.indep.temp, output = "AICbp")
 
 ########### Check that --- 
 
+##################################################################################################
+###### Compare fit of models
+##################################################################################################
+mar2.full$AICc
+mar2.bottom.up$AICc
+mar2.indep$AICc 
+mar1.full.bis$AICc
+mar1.null.bis$AICc #even higher, how is it possible when compared to VAR? 
 
+mar2.full$AIC
+mar2.bottom.up$AIC
+mar2.indep$AIC 
+mar1.full.bis$AIC
+mar1.null.bis$AIC
+### They are quite close to each other, but clearly below  MAR(1)
+### T=33
+### BIC=AIC-2*kparam+kparam*log(T)
+
+#### Creates table with AIC and BIC values
+## Initialize
+mar1.null.bis$BIC=mar.bic(mar1.null.bis)
+aic.table2=data.frame(mar1.null.bis$logLik,mar1.null.bis$AIC,mar1.null.bis$AICc,mar1.null.bis$BIC)
+names(aic.table2)=c("logLik","AIC","AICc","BIC")
+
+mar1.full.bis$BIC=mar.bic(mar1.full.bis)
+aic.table2.temp=data.frame(mar1.full.bis$logLik,mar1.full.bis$AIC,mar1.full.bis$AICc,mar1.full.bis$BIC)
+names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
+aic.table2=rbind(aic.table2,aic.table2.temp)
+
+mar2.full$BIC=mar.bic(mar2.full)
+aic.table2.temp=data.frame(mar2.full$logLik,mar2.full$AIC,mar2.full$AICc,mar2.full$BIC)
+names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
+aic.table2=rbind(aic.table2,aic.table2.temp)
+
+mar2.bottom.up$BIC=mar.bic(mar2.bottom.up)
+aic.table2.temp=data.frame(mar2.bottom.up$logLik,mar2.bottom.up$AIC,mar2.bottom.up$AICc,mar2.bottom.up$BIC)
+names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
+aic.table2=rbind(aic.table2,aic.table2.temp)
+
+mar2.indep$BIC=mar.bic(mar2.indep)
+aic.table2.temp=data.frame(mar2.indep$logLik,mar2.indep$AIC,mar2.indep$AICc,mar2.indep$BIC)
+names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
+aic.table2=rbind(aic.table2,aic.table2.temp)
+
+mar2.indep.temp$BIC=mar.bic(mar2.indep.temp)
+aic.table2.temp=data.frame(mar2.indep.temp$logLik,mar2.indep.temp$AIC,mar2.indep.temp$AICc,mar2.indep.temp$BIC)
+names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
+aic.table2=rbind(aic.table2,aic.table2.temp)
+
+
+rownames(aic.table2)=c("mar1.null.bis","mar1.full.bis","mar2.full","mar2.bottom.up","mar2.indep","mar2.indep.temp")
+
+aic.table2
+write.csv(aic.table2,file="mar2/aic.table2.csv")
+
+############ Previous estimates #####################################################################
+MARSSaic(mar2.full, output = "AICbp") ### AIC: 129.5646   AICc: 133.5646   AICbp(param): 143.6595 
+MARSSaic(mar2.bottom.up, output = "AICbp") ### AIC: 129.8294   AICc: 131.7604   AICbp(param): 137.406   
+MARSSaic(mar2.indep,output = "AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 133.7121   
+MARSSaic(mar1.full.bis,output = "AICbp") ### AIC: 140.8294   AICc: 142.2531   AICbp(param): 148.7717   
+MARSSaic(mar1.null.bis,output = "AICbp") ### AIC: 143.1355   AICc: 143.7913   AICbp(param): 147.0655   
+MARSSaic(mar2.indep.temp,output="AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 134.6404   
+######################################################################################################
+
+########################## Note and other analyses ###########"""""""###############################
 #### I'll be tempted to do some Bayesian comparison for the MAR(1), MAR(2) indep and bottom-up, with classical diagonal covariance structure. 
 # - And some fit of models with lm() too
-
 
 growth_rate_bis = growth_rate[,2:ncol(x)]
 x_current = x[,2:ncol(x)]
@@ -826,10 +876,37 @@ BIC(lm1,lm1.delayed)
 AIC(lm2,lm2.delayed)
 BIC(lm2,lm2.delayed)
 
-### BIC favors mostly the MAR(1)
+### BIC favors mostly the MAR(1) here, taking the other species as a covariate. 
 
-### Other stuff, e.g. simulate the data according to a MAR(1) and see what happens
+################# We use now VAR to check the model order ############################################
+library(vars)
+varpp<-VAR(y=data.frame(t(xbis)), type="none",lag.max=5)
+## Considering 5 maximum lags and using VAR(p) estimation with "vars" package (MAR(p) in ecology)
+varpp #Yields model order=3
+### Note this is somewhat consistent with previous results, at least concerning AIC (see below for BIC)
+## http://raunvisindastofnun.hi.is/sites/raunvisindastofnun.hi.is/files/rh-18-2003.pdf
+# I also tried a lag.max = 20, gives lag 7
+# clearly this is overparameterized and would need some more work on model selection
+
+###### Looking at several model selection criteria
+var_order_select=VARselect(y=data.frame(t(xbis)), type="none",lag.max=5)
+var_order_select
+
+### The AIC selects 3 lags and the BIC and HQ, that are more conservative, two lags. 
+#######################################################################################################
+
+#####################################################################################
+##################### Simulation-based model selection ##############################
+####################################################################################
+
+###### 1. Can we get the right cross-correlation patterns with the best-fitting models? 
+
+###### 2. Can the models be correctly identified - given the time series length? 
+
+### Simulate the data according to a MAR(1) and see which model fits best
 sim.data=MARSSsimulate(mar1.full, nsim=1, tSteps=100)$sim.data
+
+### Other thing
 residuals(mar2.indep.temp)$model.residuals ## why the f** are these 0? 
 
 plot(1:100,sim.data[1,,],type="o")
@@ -916,10 +993,13 @@ MARSSparamCIs(mar2.bottom.up.sim)
 # 
 # CIs calculated at alpha = 0.05 via method=hessian 
 
+
+############### Old results -- different simulation ########################################################"
 MARSSaic(mar1.full.sim, output = "AICbp") ### AIC: 410.4315   AICc: 410.8713   AICbp(param): 412.8782 
 MARSSaic(mar2.full.sim, output = "AICbp") ### AIC: 410.7696   AICc: 411.9461   AICbp(param): 415.0599   
 MARSSaic(mar2.bottom.up.sim, output = "AICbp") ### AIC: 427.4286   AICc: 428.0181   AICbp(param): 429.6933   
 ### So here we select quite clearly the right model (here, the MAR(1) model) with AICbp. 
+#############################################################################################################
 
 ### This tends to suggest that the bottom-up model is appropriate on the real data - or that we don't know. 
 ### I need to check the coefficients of these models in quite some details. 
