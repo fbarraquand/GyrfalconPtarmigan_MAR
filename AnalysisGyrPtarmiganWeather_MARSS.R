@@ -7,6 +7,8 @@
 ### Initializing
 rm(list=ls())
 graphics.off()
+### Setting the seed to keep the same simulations
+set.seed(42) # What else?
 
 ### Reading data on gyr-ptarmigan
 DGP<-read.csv("Gyrfalcon_Data.csv")
@@ -753,7 +755,7 @@ mar2.indep.temp=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags) #,MCInit=TRUE
 mar2.indep.temp=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags,method="BFGS") 
 
 MARSSparamCIs(mar2.indep.temp)
-MARSSaic(mar2.indep.temp, output = "AICbp")
+# MARSSaic(mar2.indep.temp, output = "AICbp")
 # AICbp calculation in progress...
 # |2%      |20%      |40%      |60%      |80%      |100%
 #   Progress: ||||||||||||||||||||||||||||||||||||||||||||||||||
@@ -845,12 +847,12 @@ aic.table2
 write.csv(aic.table2,file="mar2/aic.table2.csv")
 
 ############ Previous estimates #####################################################################
-MARSSaic(mar2.full, output = "AICbp") ### AIC: 129.5646   AICc: 133.5646   AICbp(param): 143.6595 
-MARSSaic(mar2.bottom.up, output = "AICbp") ### AIC: 129.8294   AICc: 131.7604   AICbp(param): 137.406   
-MARSSaic(mar2.indep,output = "AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 133.7121   
-MARSSaic(mar1.full.bis,output = "AICbp") ### AIC: 140.8294   AICc: 142.2531   AICbp(param): 148.7717   
-MARSSaic(mar1.null.bis,output = "AICbp") ### AIC: 143.1355   AICc: 143.7913   AICbp(param): 147.0655   
-MARSSaic(mar2.indep.temp,output="AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 134.6404   
+#MARSSaic(mar2.full, output = "AICbp") ### AIC: 129.5646   AICc: 133.5646   AICbp(param): 143.6595 
+#MARSSaic(mar2.bottom.up, output = "AICbp") ### AIC: 129.8294   AICc: 131.7604   AICbp(param): 137.406   
+#MARSSaic(mar2.indep,output = "AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 133.7121   
+#MARSSaic(mar1.full.bis,output = "AICbp") ### AIC: 140.8294   AICc: 142.2531   AICbp(param): 148.7717   
+#MARSSaic(mar1.null.bis,output = "AICbp") ### AIC: 143.1355   AICc: 143.7913   AICbp(param): 147.0655   
+#MARSSaic(mar2.indep.temp,output="AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 134.6404   
 ######################################################################################################
 
 ########################## Note and other analyses ###########"""""""###############################
