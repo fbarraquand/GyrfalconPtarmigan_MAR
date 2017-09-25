@@ -1,0 +1,39 @@
+%% LyX 2.1.4 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+\begin{table}
+\begin{centering}
+\begin{tabular}{lllll}
+\hline 
+Model type  & logLik & AIC & AICc & BIC\tabularnewline
+\hline 
+MAR(1) null & -67.57 & 143.1 & 143.8 & 149.1\tabularnewline
+MAR(1) full & -64.41 & 140.8 & 142.3 & 149.8\tabularnewline
+MAR(2) full & -54.78 & 129.6 & 133.6 & 144.5\tabularnewline
+MAR(2) full & -57.91 & 129.8 & 131.8 & 140.3\tabularnewline
+MAR(2) null  & -58.78 & 129.6 & 131.0 & 138.5\tabularnewline
+MAR(2) null + temperature & -56.95 & 129.9 & 132.4 & 141.9\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\caption{Comparison of model selection criteria for MAR(1) and MAR(2) models
+with different structures. See the main text for definitions. MAR(2)
+null + temperature adds temperature that were found marginally significant
+in previous MAR(1) analyses. \label{tab:AICtable_MAR2}}
+\end{table}
+
+\end{document}

@@ -1,0 +1,45 @@
+%% LyX 2.1.4 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amstext}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+\begin{table}
+\begin{centering}
+\begin{tabular}{lllll}
+\hline 
+Parameter  & value & SE & lower 95\% CI & upper 95\% CI\tabularnewline
+\hline 
+$b_{11}$ & 0.74758 & 0.10712 &  0.5376405 & 0.95752\tabularnewline
+$b_{21}$ & 0.20315 & 0.10440 & -0.0014615 & 0.40777\tabularnewline
+$b_{12}$ & -0.19844 & 0.11357 & -0.4210356 & 0.02415\tabularnewline
+$b_{22}$ &  0.70214 & 0.10430 &  0.4977086 & 0.90657\tabularnewline
+$\text{temperatureMay}_{t+1}$ & -0.08535 & 0.11425 & -0.3092810 & 0.13858\tabularnewline
+$\text{rainMay}_{t+1}$ & -0.15968 & 0.10912 & -0.3735464 & 0.05419\tabularnewline
+$\text{temperatureApril}_{t-4}$ &  0.20727 & 0.10617 & -0.0008174 & 0.41536\tabularnewline
+$\text{rainApril}_{t-4}$ & -0.05587 & 0.10684 & -0.2652708 & 0.15353\tabularnewline
+$\sigma_{1}^{2}$ &  0.36538 & 0.07437 &  0.2104110 & 0.56285\tabularnewline
+$\sigma_{2}^{2}$ &  0.34187 & 0.07337 &  0.1943863 & 0.53072\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\caption{Coefficients for biotic and abiotic effects on population growth.
+Species 1 is ptarmigan and species 2 gyrfalcon. May variables only
+affect species 1 while April variables, delayed by 5 years (we model
+the effect of variables at $t-4$ on growth between $t$ and $t+1$),
+affect only species 2's population growth. \label{tab:Estimates_MAR1both}}
+\end{table}
+
+\end{document}

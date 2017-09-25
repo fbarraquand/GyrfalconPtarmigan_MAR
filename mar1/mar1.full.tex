@@ -1,0 +1,45 @@
+%% LyX 2.1.4 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amsmath}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+\begin{table}\label{tab:Estimates_MAR1full}
+\begin{centering}
+\begin{tabular}{lllll}
+\hline 
+Parameter  & value & SE & lower 95\% CI & upper 95\% CI\tabularnewline
+\hline 
+$b_{11}$ &  0.7710 & 0.11129 &  0.5528321 &  0.98908\tabularnewline
+$b_{21}$ &  0.2150 & 0.10961 &  0.0001838 &  0.42984\tabularnewline
+$b_{12}$ & -0.2333 & 0.11142 & -0.4516968 & -0.01495\tabularnewline
+$b_{22}$ &  0.6601 & 0.10976 &  0.4449659 &  0.87520\tabularnewline
+$\sigma_{1}^{2}$ &  0.3961 & 0.07747 &  0.2280603 &  0.61035\tabularnewline
+$\sigma_{2}^{2}$ &  0.3844 & 0.07631 &  0.2212871 &  0.59222\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\caption{Estimates of the MAR(1) full model, without environmental covariates,
+$\mathbf{x_{t+1}}=\mathbf{Bx_{t}}\mathbf{+e_{t}},\mathbf{e_{t}}\sim\mathcal{N}_{2}(0,\mathbf{\Sigma})$,
+with interaction matrix $\mathbf{B}=\begin{pmatrix}b_{11} & b_{12}\protect\\
+b_{21} & b_{22}^{(1)}
+\end{pmatrix}$ and error matrix $\Sigma=\begin{pmatrix}\sigma_{1}^{2} & 0\protect\\
+0 & \sigma_{2}^{2}
+\end{pmatrix}$ . The off-diagonal interaction coefficients are statistically significant
+at a 95\% level. Similar results are obtained for non-diagonal $\Sigma$
+(not shown); for parsimony we use a diagonal error matrix. }
+\end{table}
+
+\end{document}

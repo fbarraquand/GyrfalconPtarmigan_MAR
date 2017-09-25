@@ -1,0 +1,45 @@
+%% LyX 2.1.4 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+\begin{table}
+\begin{tabular}{lllll}
+\hline 
+Model type & logLikelihood & AIC & AICc & BIC\tabularnewline
+\hline 
+MAR(1) null & -70.01 & 148.0 & 148.7 & 154.1\tabularnewline
+MAR(1) null & -66.14 & 144.3 & 145.7 & 153.4\tabularnewline
+MAR(1) full + May temperature year $t$ & -63.98 & 144.0 & 146.4 & 156.2\tabularnewline
+MAR(1) null + May temperature year $t$ & -67.03 & 146.1 & 147.4 & 155.2\tabularnewline
+MAR(1) full + May temp. of year $t-1$ & -63.94 & 143.9 & 146.3 & 156.1\tabularnewline
+MAR(1) full + May log(rainfall) of $t-1$ & -64.89 & 145.8 & 148.2 & 158.0\tabularnewline
+MAR(1) full + May temp + log(rainfall)  & -62.81 & 145.6 & 149.5 & 160.9\tabularnewline
+MAR(1) full + July temperature year $t-1$ & -61.95 & 143.9 & 147.8 & 159.2\tabularnewline
+MAR(1) full + June temperature effects $t-1$ & -63.79 & 147.6 & 151.4 & 162.8\tabularnewline
+\hline 
+\end{tabular}
+
+\caption{Comparison of model selection criteria for the various MAR(1) models.
+MAR(1) `null' indicates a diagonal $\mathbf{B}$ matrix while MAR(1)
+`full' indicates a full 2x2 interaction matrix. Models including temperature
+(third row and below) effects on growth rates take the form $\mathbf{x_{t+1}}=\mathbf{a}+\mathbf{Bx_{t}}+\mathbf{Cu_{t}}+\mathbf{e_{t}},\mathbf{e_{t}}\sim\mathcal{N}_{2}(0,\mathbf{\Sigma})$.
+Here the environmental vector $\mathbf{u_{t}}=(T_{t-l_{P}},R_{t-l_{P}},T_{t-l_{G}},R_{t-l_{G}})^{T}$,
+with $T$ the temperature and $R$ log-rainfall. There is a timelag
+$l_{P}$ for the ptarmigan (0 or 1 year) and $l_{G}=5$ for the gyrfalcon:
+weather is expected to have delayed effects because of stage structure
+in the gyrfalcon population. \label{tab:AICtable_MAR1}}
+\end{table}
+
+\end{document}

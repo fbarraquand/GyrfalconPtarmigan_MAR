@@ -9,6 +9,8 @@ rm(list=ls())
 graphics.off()
 ### Setting the seed to keep the same simulations
 set.seed(42) # What else?
+options(digits=4)
+
 
 ### Reading data on gyr-ptarmigan
 DGP<-read.csv("Gyrfalcon_Data.csv")
@@ -219,6 +221,9 @@ CIs.mar1.temp=MARSSparamCIs(mar1.temp)
 
 ####### Storage of interaction matrices B and environmental matrices C ################
 
+## function for storage 
+# [to add there when I have the time - at the moment this is not very elegant]
+
 # Storage full model
 value=mar1.full$par$B#value=CIs.mar1.full$par$B
 SE=CIs.mar1.full$par.se$B
@@ -235,7 +240,7 @@ SE=CIs.mar1.full$par.se$Q
 lower=CIs.mar1.full$par.lowCI$Q
 upper=CIs.mar1.full$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.full.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.full.csv")
 
 mar1.null$par$B
 #Storage null model
@@ -254,7 +259,7 @@ SE=CIs.mar1.null$par.se$Q
 lower=CIs.mar1.null$par.lowCI$Q
 upper=CIs.mar1.null$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.null.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.null.csv")
 
 mar1.temp$par$B
 #Storage full model with effect of temperature
@@ -273,7 +278,7 @@ SE=CIs.mar1.temp$par.se$Q
 lower=CIs.mar1.temp$par.lowCI$Q
 upper=CIs.mar1.temp$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.temp.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.temp.csv")
 
 covar=t(as.matrix(cbind(tempMay_year,tempApril_year_minus4)))
 C1=matrix(list("tempMay_year",0,0,"tempApril_year_minus4"),2,2,byrow=T)
@@ -299,7 +304,7 @@ SE=CIs.mar1.temp.only$par.se$Q
 lower=CIs.mar1.temp.only$par.lowCI$Q
 upper=CIs.mar1.temp.only$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.temp.only.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.temp.only.csv")
 
 
 ### Delay one more year the temperature for ptarmigan. 
@@ -328,7 +333,7 @@ SE=CIs.mar1.temp1$par.se$Q
 lower=CIs.mar1.temp1$par.lowCI$Q
 upper=CIs.mar1.temp1$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.temp1.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.temp1.csv")
 
 ### Now a model with rainfall
 covar=t(as.matrix(cbind(rainMay_year,rainApril_year_minus4)))
@@ -357,7 +362,7 @@ SE=CIs.mar1.rain$par.se$Q
 lower=CIs.mar1.rain$par.lowCI$Q
 upper=CIs.mar1.rain$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.rain.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.rain.csv")
 
 ### With temperature + rainfall
 covar=t(as.matrix(cbind(tempMay_year,rainMay_year,tempApril_year_minus4,rainApril_year_minus4)))
@@ -385,7 +390,7 @@ SE=CIs.mar1.both$par.se$Q
 lower=CIs.mar1.both$par.lowCI$Q
 upper=CIs.mar1.both$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.both.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.csv")
 
 ### First comparison of AICc/BIC for all models 
 mar.bic <- function(my.mar)
@@ -448,7 +453,7 @@ rownames(aic.table)=c("mar1.null","mar1.full","mar1.temp","mar1.temp.only","mar1
 
 ### AIC table shows the full model is better -- did we find that earlier? Not by much though
 aic.table
-write.csv(aic.table,file="mar1/aic.table.csv")
+write.csv(format(aic.table,digits=4),file="mar1/aic.table.csv")
 ### we keep in the set of nested models mar1.full, mar1.temp and mar1.temp1
 
 #############################################################
@@ -479,7 +484,7 @@ SE=CIs.mar1.both.june$par.se$Q
 lower=CIs.mar1.both.june$par.lowCI$Q
 upper=CIs.mar1.both.june$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.both.june.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.june.csv")
 
 covar=t(as.matrix(cbind(tempJuly_year,rainJuly_year,tempApril_year_minus4,rainApril_year_minus4)))
 C1=matrix(list("tempJuly_year","rainJuly_year",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
@@ -505,7 +510,7 @@ SE=CIs.mar1.both.july$par.se$Q
 lower=CIs.mar1.both.july$par.lowCI$Q
 upper=CIs.mar1.both.july$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar1/mar1.both.july.csv")
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.july.csv")
 
 nrow(aic.table) ## How many models have we now
 
@@ -521,7 +526,7 @@ aic.table=rbind(aic.table,aic.table.temp)
 
 aic.table[8:9,]
 rownames(aic.table)[8:9]=c("mar1.both.july","mar1.both.june")
-write.csv(aic.table,file="mar1/aic.table.csv")
+write.csv(format(aic.table,digits=4),file="mar1/aic.table.csv")
 
 #############################################################
 ### Alternate models with winter weather to check
@@ -643,7 +648,7 @@ SE=CIs.mar2.full$par.se$Q
 lower=CIs.mar2.full$par.lowCI$Q
 upper=CIs.mar2.full$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar2/mar2.full.csv")
+write.csv(format(mar1.data,digits=4),file="mar2/mar2.full.csv")
 
 
 #### Bottom-up model that we highlighted before -- with an effect of prey on predator growth the next year. 
@@ -674,7 +679,7 @@ SE=CIs.mar2.bottom.up$par.se$Q
 lower=CIs.mar2.bottom.up$par.lowCI$Q
 upper=CIs.mar2.bottom.up$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar2/mar2.bottom.up.csv")
+write.csv(format(mar1.data,digits=4),file="mar2/mar2.bottom.up.csv")
 
 ### Independent AR(2) models
 B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
@@ -704,7 +709,7 @@ SE=CIs.mar2.indep$par.se$Q
 lower=CIs.mar2.indep$par.lowCI$Q
 upper=CIs.mar2.indep$par.upCI$Q
 mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-write.csv(mar1.data,file="mar2/mar2.indep.csv")
+write.csv(format(mar1.data,digits=4),file="mar2/mar2.indep.csv")
 
 ################### Full MAR(1) with same number of data points // TS length affects AIC ##################
 ### State-space, observation part - never changes 
@@ -844,7 +849,7 @@ aic.table2=rbind(aic.table2,aic.table2.temp)
 rownames(aic.table2)=c("mar1.null.bis","mar1.full.bis","mar2.full","mar2.bottom.up","mar2.indep","mar2.indep.temp")
 
 aic.table2
-write.csv(aic.table2,file="mar2/aic.table2.csv")
+write.csv(format(aic.table2,digits=4),file="mar2/aic.table2.csv")
 
 ############ Previous estimates #####################################################################
 #MARSSaic(mar2.full, output = "AICbp") ### AIC: 129.5646   AICc: 133.5646   AICbp(param): 143.6595 
@@ -1230,31 +1235,14 @@ B
 model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
 mar2.bottom.up.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
 CIs.mar2.bottom.up.sim=MARSSparamCIs(mar2.bottom.up.sim) 
-### MARSSparamCIs(mar2.bottom.up.sim)
-# 
-# MARSS fit is
-# Estimation method: kem 
-# Convergence test: conv.test.slope.tol = 0.5, abstol = 0.001
-# Algorithm ran 15 (=minit) iterations and convergence was reached. 
-# Log-likelihood: -206.7143 
-# AIC: 427.4286   AICc: 428.0181   
-# 
-# ML.Est Std.Err low.CI    up.CI
-# B.b11_1  0.87476  0.1027  0.673  1.07603
-# B.b22_1  0.65843  0.0868  0.488  0.82853
-# B.b11_2 -0.08725  0.1044 -0.292  0.11740
-# B.b12_2 -0.18226  0.0879 -0.355 -0.00994
-# B.b22_2 -0.00345  0.0633 -0.128  0.12064
-# Q.q11    0.51215  0.0511  0.379  0.66559
-# Q.q22    0.45477  0.0482  0.336  0.59101
-# 
-# CIs calculated at alpha = 0.05 via method=hessian 
+
 
 
 ############### Old results -- different simulation ########################################################"
-MARSSaic(mar1.full.sim, output = "AICbp") ### AIC: 410.4315   AICc: 410.8713   AICbp(param): 412.8782 
-MARSSaic(mar2.full.sim, output = "AICbp") ### AIC: 410.7696   AICc: 411.9461   AICbp(param): 415.0599   
-MARSSaic(mar2.bottom.up.sim, output = "AICbp") ### AIC: 427.4286   AICc: 428.0181   AICbp(param): 429.6933   
+### Warning: takes ages --
+#MARSSaic(mar1.full.sim, output = "AICbp") ### AIC: 410.4315   AICc: 410.8713   AICbp(param): 412.8782 
+#MARSSaic(mar2.full.sim, output = "AICbp") ### AIC: 410.7696   AICc: 411.9461   AICbp(param): 415.0599   
+#MARSSaic(mar2.bottom.up.sim, output = "AICbp") ### AIC: 427.4286   AICc: 428.0181   AICbp(param): 429.6933   
 ### So here we select quite clearly the right model (here, the MAR(1) model) with AICbp. 
 #############################################################################################################
 
@@ -1289,234 +1277,90 @@ plot(new_occupancy2*80,type="o") ## between 60 and 100 birds, nothing crazy.
 # and a mechanistic model - with predation included - for the ptarmigan. Perhaps based on Erla's models? 
 # Knowing that there is also a lot of hunting, and other predators of ptarmigan. 
 
-######## Now simulate for only 33 years ##################
+######## Now simulate for only 33 years ############################################
 ### Other stuff, e.g. simulate the data according to a MAR(1) and see what happens
-
-### Plot those
-plot(1:35,sim.data[1,,],type="o")
-lines(1:35,sim.data[2,,],type="o",col="red")
-xsim=matrix(c(sim.data[1,,1],sim.data[2,,1]),nrow=2,byrow=T) ## Put that into a matrix
+#####################################################################################
 
 #### Make a figure showing the simulated predator-prey and the simulated bottom-up
-sim.data=MARSSsimulate(mar1.full, nsim=1, tSteps=35)$sim.data
-sim.data2=MARSSsimulate(mar2.bottom.up, nsim=1, tSteps=35)$sim.data
-### Plot both
+sim.data=MARSSsimulate(mar1.full, nsim=100, tSteps=35)$sim.data
+sim.data2=MARSSsimulate(mar2.bottom.up, nsim=100, tSteps=35)$sim.data
+### Plot both models for two repeats - difficult to tell. 
 pdf("SimulatedModels35ts.pdf",width=6,height=8)
 par(pch=19,cex=1.5,lwd=3,mfrow=c(2,1))
-plot(1:35,sim.data[1,,],type="o",xlab="Years",ylab="Stdized pop. density")
-lines(1:35,sim.data[2,,],type="o",col="red")
-plot(1:35,sim.data2[1,,],type="o",xlab="Years",ylab="Stdized pop. density")
-lines(1:35,sim.data2[2,,],type="o",col="red")
+plot(1:35,sim.data[1,,1],type="o",xlab="Years",ylab="Stdized pop. density")
+lines(1:35,sim.data[2,,1],type="o",col="red")
+plot(1:35,sim.data2[1,,2],type="o",xlab="Years",ylab="Stdized pop. density")
+lines(1:35,sim.data2[2,,2],type="o",col="blue")
 dev.off()
 
-### Now try to MAR(2) and MAR(1) analyze this data
+### Now try fit MAR(1) and MAR(2) to analyze this data
 
-#MAR(1)
-Z1=diag(1,2)                 ### Diagonal matrix from intrinsic to observed variables
-A1=matrix(list(0,0),2,1)     ### Intercept state space = 0
-R1=matrix(list(0,0,0,0),2,2) ### Error matrix state-space = 0
-### Initial values
-pi1=matrix(0,2,1); #Initial values
-V1=diag(1,2)
+### --- stopped there  // stuff to do to finish the paper and give perspective --- ### 
 
-### Process model part
-### Setting matrices
-B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
-U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
-Q1="diagonal and unequal"
+for (krep in 1:100){ # for all the repeats
+  
+  #Fit MAR(1) model to MAR(1) sim
+  #MAR(1)
+  Z1=diag(1,2)                 ### Diagonal matrix from intrinsic to observed variables
+  A1=matrix(list(0,0),2,1)     ### Intercept state space = 0
+  R1=matrix(list(0,0,0,0),2,2) ### Error matrix state-space = 0
+  ### Initial values
+  pi1=matrix(0,2,1); #Initial values
+  V1=diag(1,2)
+  
+  ### Process model part
+  ### Setting matrices
+  B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
+  U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
+  Q1="diagonal and unequal"
+  
+  # Estimation
+  model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
+  mar1.full.sim=MARSS(xsim[,2:ncol(xsim)], model=model.list) #MARSSparamCIs(mar1.full.sim) 
+  mar1.full.sim$AIC
+  
+  #Fit MAR(2) bottom-up sim to MAR(1) sim
+  ### State-space, observation part - never changes 
+  Z=matrix(c(1,0,0,1,0,0,0,0),2,4) ### Diagonal matrix from intrinsic to observed variables, 0 for delayed variables
+  A=matrix(0,2,1)### Intercept state space = 0
+  R=matrix(0,2,2) ### Error matrix state-space = 0
+  
+  ### Initial values
+  V=matrix(0,4,4)
+  pi=matrix(c(xsim[,2],xsim[,1]),4,1)
+  pi
+  
+  B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
+  B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+  B=matrix(list(0),4,4)
+  B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
+  B
+  
+  ### Process error matrix
+  U=matrix(0,4,1)
+  Q=matrix(list(0),4,4)
+  Q[1,1]="q11"; Q[2,2]="q22"
+  Q
+  
+  ### Model call
+  model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+  mar2.bottom.up.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
+  MARSSparamCIs(mar2.bottom.up.sim) 
+  
+  #Fit MAR(1) model to MAR(2) bottom-up sim
+  
+  #Fit MAR(2) bottom-up sim to MAR(2) sim
+  
+}
 
-# Estimation
-model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
-mar1.full.sim=MARSS(xsim[,2:ncol(xsim)], model=model.list)
-MARSSparamCIs(mar1.full.sim) 
-
-### Now MAR(2)
-### State-space, observation part - never changes 
-Z=matrix(c(1,0,0,1,0,0,0,0),2,4) ### Diagonal matrix from intrinsic to observed variables, 0 for delayed variables
-A=matrix(0,2,1)### Intercept state space = 0
-R=matrix(0,2,2) ### Error matrix state-space = 0
-
-### Initial values
-V=matrix(0,4,4)
-pi=matrix(c(xsim[,2],xsim[,1]),4,1)
-pi
-
-### Interaction matrix
-B1=matrix(list("b11_1","b12_1","b21_1","b22_1"),2,2,byrow = T)
-B2=matrix(list("b11_2","b12_2","b21_2","b22_2"),2,2,byrow = T)
-B=matrix(list(0),4,4)
-B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
-B
-
-### Process error matrix
-U=matrix(0,4,1)
-Q=matrix(list(0),4,4)
-Q[1,1]="q11"; Q[2,2]="q22"
-Q
-#stacked_data=rbind(xbis[,2:nrow(DGP)],xbis[,1:(nrow(DGP)-1)])
-
-### Model call
-model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
-mar2.full.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
-
-### Interaction matrix
-B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
-B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
-B=matrix(list(0),4,4)
-B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
-B
-model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
-mar2.bottom.up.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
-MARSSparamCIs(mar2.bottom.up.sim) 
-
-MARSSaic(mar1.full.sim, output = "AICbp") ###AIC: 111.6506   AICc: 113.0277   AICbp(param): 116.3878   
-# Coeffs
-# Estimate
-# B.b11           0.6389
-# B.b21           0.0842
-# B.b12          -0.5065
-# B.b22           0.2907
-# Q.(X.Y1,X.Y1)   0.2711
-# Q.(X.Y2,X.Y2)   0.2236
-MARSSaic(mar2.full.sim, output = "AICbp") ###AIC: 104.5234   AICc: 108.3831   AICbp(param): 115.959   
-# Coeffs
-# Estimate
-# B.b11_1  0.96058
-# B.b21_1  0.00368
-# B.b12_1 -0.46595
-# B.b22_1  0.29607
-# B.b11_2 -0.27712
-# B.b21_2  0.05380
-# B.b12_2  0.53499
-# B.b22_2 -0.17746
-# Q.q11    0.20422
-# Q.q22    0.21743
-MARSSaic(mar2.bottom.up.sim, output = "AICbp") ### AIC: 104.5126   AICc: 106.3793   AICbp(param): 108.3304   
-# Coeffs
-# Estimate
-# B.b11_1    1.103
-# B.b22_1    0.316
-# B.b11_2   -0.445
-# B.b12_2    0.464
-# B.b22_2   -0.203
-# Q.q11      0.243
-# Q.q22      0.219
-mar1_sim_35steps_bic=mar.bic(mar1.full.sim)
-mar2_sim_35steps_bic=mar.bic(mar2.full.sim)
-mar2_bottomUp_35steps_bic=mar.bic(mar2.bottom.up.sim)
-# > mar1_sim_35steps_bic
-# [1] 120.8088
-# > mar2_sim_35steps_bic
-# [1] 119.7871
-# > mar2_bottomUp_35steps_bic
-# [1] 115.1971
-
-###########################################################################################################################
-### Argh -- on this very short time series length, MAR(1) vs MAR(2) models are not identifiable. 
-### And this is not even something we can use generally to discuss results of Vik because they had 100 years of data... 
-### Should I check whether we get the same thing with different simulations? YES
-
-###### New simulation
-
-#MAR(1)
-Z1=diag(1,2)                 ### Diagonal matrix from intrinsic to observed variables
-A1=matrix(list(0,0),2,1)     ### Intercept state space = 0
-R1=matrix(list(0,0,0,0),2,2) ### Error matrix state-space = 0
-### Initial values
-pi1=matrix(0,2,1); #Initial values
-V1=diag(1,2)
-
-### Process model part
-### Setting matrices
-B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
-U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
-Q1="diagonal and unequal"
-
-# Estimation
-model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
-mar1.full.sim=MARSS(xsim[,2:ncol(xsim)], model=model.list)
-MARSSparamCIs(mar1.full.sim) 
 
 ### Now MAR(2)
-### State-space, observation part - never changes 
-Z=matrix(c(1,0,0,1,0,0,0,0),2,4) ### Diagonal matrix from intrinsic to observed variables, 0 for delayed variables
-A=matrix(0,2,1)### Intercept state space = 0
-R=matrix(0,2,2) ### Error matrix state-space = 0
 
-### Initial values
-V=matrix(0,4,4)
-pi=matrix(c(xsim[,2],xsim[,1]),4,1)
-pi
 
 ### Interaction matrix
-B1=matrix(list("b11_1","b12_1","b21_1","b22_1"),2,2,byrow = T)
-B2=matrix(list("b11_2","b12_2","b21_2","b22_2"),2,2,byrow = T)
-B=matrix(list(0),4,4)
-B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
-B
 
-### Process error matrix
-U=matrix(0,4,1)
-Q=matrix(list(0),4,4)
-Q[1,1]="q11"; Q[2,2]="q22"
-Q
-#stacked_data=rbind(xbis[,2:nrow(DGP)],xbis[,1:(nrow(DGP)-1)])
 
-### Model call
-model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
-mar2.full.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
 
-### Interaction matrix
-B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
-B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
-B=matrix(list(0),4,4)
-B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
-B
-model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
-mar2.bottom.up.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
-MARSSparamCIs(mar2.bottom.up.sim) 
-
-MARSSaic(mar1.full.sim, output = "AICbp") ### AIC: 111.6506   AICc: 113.0277   AICbp(param): 115.2834   
-MARSSaic(mar2.full.sim, output = "AICbp") ### AIC: 104.5234   AICc: 108.3831   AICbp(param): 114.7151   
-MARSSaic(mar2.bottom.up.sim, output = "AICbp") ### AIC: 104.5126   AICc: 106.3793   AICbp(param): 108.0672   
-
-mar1_sim_35steps_bic=mar.bic(mar1.full.sim)
-mar2_sim_35steps_bic=mar.bic(mar2.full.sim)
-mar2_bottomUp_35steps_bic=mar.bic(mar2.bottom.up.sim)
-# > mar1_sim_35steps_bic
-# [1] 120.8088
-# > mar2_sim_35steps_bic
-# [1] 119.7871
-# > mar2_bottomUp_35steps_bic
-# [1] 115.1971
-
-###### Conclusion (preliminary?) - likely that MAR(2) bottom-up model is best whenever we simulate with MAR(1) full. 
-### NB I could try to analyze these data with lm() - would be interesting (but more of a modelling project?)
-
-### rewriting the data structure in the exact same fashion as for the true data. 
-growth_rate = xsim[,2: ncol(xsim)]-xsim[,1:(ncol(xsim)-1)]
-xs=xsim[,1:(ncol(xsim)-1)]
-growth_rate_bis = growth_rate[,2:ncol(xs)]
-x_current = xsim[,2:ncol(xs)]
-x_delayed =  xsim[,1:(ncol(xs)-1)]
-
-lm1=lm(growth_rate_bis[1,] ~ 0 + x_current[1,]+x_current[2,])# pb
-lm2=lm(growth_rate_bis[2,] ~ 0 + x_current[1,]+x_current[2,])
-
-lm1.delayed=lm(growth_rate_bis[1,] ~ 0 + x_current[1,]+x_current[2,]+x_delayed[1,]+x_delayed[2,])# pb
-lm2.delayed=lm(growth_rate_bis[2,] ~ 0 + x_current[1,]+x_current[2,]+x_delayed[1,]+x_delayed[2,])
-### These have few significant coefficients, but that's perhaps just the TS length. 
-
-### Would it be that the delayed component of lm2 has to be removed?  
-AIC(lm1,lm1.delayed) #delayed best
-BIC(lm1,lm1.delayed) #delayed best
-AIC(lm2,lm2.delayed) #nondelayed best
-BIC(lm2,lm2.delayed) #nondelayed best
-### Inconsistent model selection but quite clear that AIC and BIC can select the delayed model even though the model is not delayed. 
-
-########################################################################################################################################
-########## Conclusion: A simulated MAR(1) model on 35 timesteps can be mistaken for a MAR(2) [need even stronger penalties for params?]
-################## Stopped there // FB 14/04/2017 ######################################################################################
 
 
 
