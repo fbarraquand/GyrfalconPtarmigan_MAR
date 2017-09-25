@@ -917,130 +917,250 @@ causality(varpp1,cause="X1")
 
 # Output the cross-correlation pattern for the data
 
-# Simulations of the fitted models 
+# Simulations of the fitted models -- only for MAR(1) null, MAR(1) full, MAR(2) full, MAR(2) bottom-up, MAR(2) indep
 
-# --- old code to improve --- #
+# -- Extract data from MAR(1) null model ---
+data1=read.csv(file="mar1/mar1.null.csv")
+data1
+B = diag(c(data1[1,]$value,data1[2,]$value))
+Sigma = diag(c(data1[3,]$value,data1[4,]$value)) ## Less variability on 
+# Simulation of model and computation of cross-correlation
+t_max=34
+# pdf("Simulated_MAR_dynamics_stdized_MAR1_null.pdf",height=28,width=14)
+# par(mfrow=c(4,2))#,cex=1.5
+# plot(1:t_max,xbis[1,],type="o",col="black",ylim=c(-3,3),ylab="Real data")#ylim=c(-3,3)
+# lines(1:t_max,xbis[2,],type="o",col="red")
+# ccf(xbis[1,],xbis[2,],ylab = "cross-correlation")
+# for(nrep in 1:7)
+# {
+#   ### Initial values
+#   x[,1]=c(-0.8,-1.8)
+#   for (t in 1:(t_max-1))
+#   {
+#     mu=c(0,0)
+#     epsilon=mvrnorm(n = 1, mu, Sigma)
+#     x[,t+1]=B %*% x[,t] + epsilon
+#   }
+#   
+#   plot(1:t_max,x[1,],type="o",col="black",ylab="(log(N)-mean)/SD",ylim=c(-3,3),main=paste("Simulation",nrep))
+#   lines(1:t_max,x[2,],type="o",col="red")
+#   ccf(x[1,],x[2,],ylab = "cross-correlation")
+# }
+# dev.off()
 
-################ Simulations of our fitted models ##################################################
-#### Full MAR(2) model
-z=matrix(0,nrow=2,ncol=nrow(DGP))
-z[,1]=runif(2,0,1)
-z[,2]=runif(2,0,1)
-z
-n=nrow(DGP)
-for (t in 2:(n-1)){
-  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
-  z[1,t+1] = a_11_l1*z[1,t] + a_12_l1*z[2,t] + a_11_l2*z[1,t-1] + a_12_l2*z[2,t-1]+eps[1]
-  z[2,t+1] = a_21_l1*z[1,t] + a_22_l1*z[2,t] + a_21_l2*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
+### -- Better representation with real cross-corr overlayed onto simulated cross-corr--- ##
+# Cross-correlation for the real data 
+c_hat = ccf(xbis[1,],xbis[2,],ylab = "cross-correlation",plot=FALSE)
+str(c_hat)
+cc_hat = c_hat$acf
+n_cc = length(cc_hat)
+y_cc_mar1null=matrix(0,100,n_cc)
+### Use 100 values to get a simulation enveloppe 
+x=matrix(0,2,t_max)
+ for(nrep in 1:100)
+{
+### Initial values
+x[,1]=xbis[,1]
+for (t in 1:(t_max-1))
+{
+  mu=c(0,0)
+  epsilon=mvrnorm(n = 1, mu, Sigma)
+  x[,t+1]=B %*% x[,t] + epsilon
 }
-matplot(t(z))
-matlines(t(z))
 
-### Not that bad...
-### Often species 2 follows species 1, as in the data. 
+y_cc_mar1null[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation")$acf)
+ }
 
-### Now let's set to zero these non-significant coeff to understand what's going on
-for (t in 2:(n-1)){
-  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
-  z[1,t+1] = a_11_l1*z[1,t] + 0*z[2,t] + a_11_l2*z[1,t-1] + 0*z[2,t-1]+eps[1]
-  z[2,t+1] = a_21_l1*z[1,t] + a_22_l1*z[2,t] + 0*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
+# Start plotting --
+pdf("crossCorrelations_simulatedModels.pdf",height=16,width=10)
+par(mfrow=c(3,2))#,cex=1.5
+# --- First panel -----
+matplot(c_hat$lag,t(y_cc_mar1null), pch=".",ylab="Cross-correlation",xlab="Time lag",main= "MAR(1) - no interactions")
+matlines(c_hat$lag,t(y_cc_mar1null))
+lines(c_hat$lag,cc_hat,col="black",lwd=4)
+add_label_legend <- function(pos = "topright", label, ...) {
+  legend(pos, label, bty = "n", ...)
 }
-matplot(t(z))
-matlines(t(z))
-### A little less realistic, clearly
+add_label_legend(label="A",cex=1.5)
+#add_label_legend(c(0.9,0.7),label="A")
+add_label_legend(c(0.8,0.6),label="A")
+# --- end of plot on MAR(1) null model --- # 
 
-### Two separate AR(2) models
-for (t in 2:(n-1)){
-  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
-  z[1,t+1] = a_11_l1*z[1,t] + 0*z[2,t] + a_11_l2*z[1,t-1] + 0*z[2,t-1]+eps[1]
-  z[2,t+1] = 0*z[1,t] + a_22_l1*z[2,t] + 0*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
-}
-matplot(t(z))
-matlines(t(z))
+# --- Extract data from MAR(1) full model --- #
+data.mar1.full=read.csv(file="mar1/mar1.full.csv")
+data.mar1.full
+B = matrix(data.mar1.full$value[1:4],2,2)
+Sigma = diag(data.mar1.full[5:6,]$value) ## Less variability on 
+# Simulation of model and computation of cross-correlation
+t_max=34
+# pdf("Simulated_MAR_dynamics_stdized_MAR1_full.pdf",height=28,width=14)
+# par(mfrow=c(4,2))#,cex=1.5
+# plot(1:t_max,xbis[1,],type="o",col="black",ylim=c(-3,3),ylab="Real data")#ylim=c(-3,3)
+# lines(1:t_max,xbis[2,],type="o",col="red")
+# ccf(xbis[1,],xbis[2,],ylab = "cross-correlation")
+# for(nrep in 1:7)
+# {
+#   ### Initial values
+#   x[,1]=c(-0.8,-1.8)
+#   for (t in 1:(t_max-1))
+#   {
+#     mu=c(0,0)
+#     epsilon=mvrnorm(n = 1, mu, Sigma)
+#     x[,t+1]=B %*% x[,t] + epsilon
+#   }
+#   
+#   plot(1:t_max,x[1,],type="o",col="black",ylab="(log(N)-mean)/SD",ylim=c(-3,3),main=paste("Simulation",nrep))
+#   lines(1:t_max,x[2,],type="o",col="red")
+#   ccf(x[1,],x[2,],ylab = "cross-correlation")
+# }
+# dev.off()
 
-### Keep the delayed effect of the predator on the prey even though non-significant
-for (t in 2:(n-1)){
-  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
-  z[1,t+1] = a_11_l1*z[1,t] + 0*z[2,t] + a_11_l2*z[1,t-1] + a_12_l2*z[2,t-1]+eps[1]
-  z[2,t+1] = 0*z[1,t] + a_22_l1*z[2,t] + 0*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
-}
-matplot(t(z))
-matlines(t(z)) # not enough
-
-### Keep the delayed effect of the prey on the predator even though non-significant
-### With the prey that is internally driven as an AR(2) model. 
-for (t in 2:(n-1)){
-  eps=mvrnorm(mu=c(0,0),Sigma=Sigma)
-  z[1,t+1] = a_11_l1*z[1,t] + 0*z[2,t] + a_11_l2*z[1,t-1] + 0*z[2,t-1]+eps[1]
-  z[2,t+1] = 0*z[1,t] + a_22_l1*z[2,t] + a_21_l2*z[1,t-1] + a_22_l2*z[2,t-1]+eps[2]
-}
-matplot(t(z))
-matlines(t(z))
-
-
-# ----------------------------#
-
-
-# Cross-correlations for simulations under the fitted models 
-
-####### ---- Code to UPDATE --- #####
-## Noise 
-Sigma = Diagonal(2, x = c(0.67,0.66)) ## Less variability on 
-pdf("Simulated_MAR_dynamics_stdized.pdf",height=28,width=14)
-par(mfrow=c(4,2))#,cex=1.5
-plot(1:t_max,xbis[1,],type="o",col="black",ylim=c(-3,3),ylab="Real data")#ylim=c(-3,3)
-lines(1:t_max,xbis[2,],type="o",col="red")
-ccf(x[1,],x[2,],ylab = "cross-correlation")
-for(nrep in 1:7)
+### -- Better representation with cross-corr overlayed --- ##
+# Cross-correlation for the real data 
+c_hat = ccf(xbis[1,],xbis[2,],ylab = "cross-correlation",plot=FALSE)
+str(c_hat)
+cc_hat = c_hat$acf
+n_cc = length(cc_hat)
+y_cc_mar1full=matrix(0,100,n_cc)
+### Use 100 values to get a simulation enveloppe 
+x=matrix(0,2,t_max)
+for(nrep in 1:100)
 {
   ### Initial values
-  x[,1]=c(-0.8,-1.8)
+  x[,1]=xbis[,1]
   for (t in 1:(t_max-1))
   {
+    mu=c(0,0)
     epsilon=mvrnorm(n = 1, mu, Sigma)
     x[,t+1]=B %*% x[,t] + epsilon
   }
   
-  #plot(1:t_max,x[1,],type="b",col="black",ylim=c(-3,3),ylab="Unstandardized log densities")
-  #lines(1:t_max,x[2,],type="b",col="red")
-  # 
-  
-  plot(1:t_max,x[1,],type="o",col="black",ylab="(log(N)-mean)/SD",ylim=c(-3,3),main=paste("Simulation",nrep))
-  lines(1:t_max,x[2,],type="o",col="red")
-  ccf(x[1,],x[2,],ylab = "cross-correlation")
+  y_cc_mar1full[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
 }
-dev.off()
 
-###
+matplot(c_hat$lag,t(y_cc_mar1full), pch=".",ylab="Cross-correlation",xlab="Time lag",main = "MAR(1) - full interactions")
+matlines(c_hat$lag,t(y_cc_mar1full))
+lines(c_hat$lag,cc_hat,col="black",lwd=4)
+add_label_legend(label="B",cex=1.5)
 
-### Simulated phase-planes
-Sigma = Diagonal(2, x = c(0.67,0.66)) ## Less variability on 
-pdf("Simulated_PhasePlane_stdized.pdf",height=28,width=14)
-par(mfrow=c(4,2))#,cex=1.5
-plot(xbis[1,],xbis[2,],type="o",col="black",ylab="Predator",xlab="Prey",main="Real data")
-arrows(xbis[1,1:33],xbis[2,1:33],xbis[1,2:34],xbis[2,2:34],length = 0.2)
-#lines(1:t_max,xbis[2,],type="o",col="red")
-ccf(x[1,],x[2,],ylab = "cross-correlation")
-for(nrep in 1:7)
+### ---- Simulation MAR(2) indep model ### 
+data.mar2.indep=read.csv(file="mar2/mar2.indep.csv")
+data.mar2.indep
+B1 = diag(data.mar2.indep$value[1:2])
+B2 = diag(data.mar2.indep$value[3:4],2,2)
+Sigma = diag(data.mar2.indep[5:6,]$value) ## Less variability on 
+y_cc_mar2indep=matrix(0,100,n_cc)
+x=matrix(0,2,t_max)
+for(nrep in 1:100)
 {
   ### Initial values
-  x[,1]=c(-0.8,-1.8)
-  for (t in 1:(t_max-1))
+  x[,1]=xbis[,1]
+  x[,2]=xbis[,2]
+  for (t in 2:(t_max-1))
   {
+    mu=c(0,0)
     epsilon=mvrnorm(n = 1, mu, Sigma)
-    x[,t+1]=B %*% x[,t] + epsilon
+    x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
   }
   
-  plot(x[1,],x[2,],type="o",col="black",ylab="Predator",xlab="Prey",main=paste("Simulation",nrep))
-  arrows(x[1,1:(t_max-1)],x[2,1:(t_max-1)],x[1,2:t_max],x[2,2:t_max],length = 0.2)
-  ccf(x[1,],x[2,],ylab = "cross-correlation")
+  y_cc_mar2indep[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
 }
-dev.off()
+matplot(c_hat$lag,t(y_cc_mar2indep), pch=".",ylab="Cross-correlation",xlab="Time lag",main = "MAR(2) - no interactions")
+matlines(c_hat$lag,t(y_cc_mar2indep))
+lines(c_hat$lag,cc_hat,col="black",lwd=4)
+add_label_legend(label="C",cex=1.5)
 
+### ---- Simulation MAR(2) bottom-up model ### 
+data.mar2.bottom.up=read.csv(file="mar2/mar2.bottom.up.csv")
+data.mar2.bottom.up
+B1 = diag(data.mar2.bottom.up$value[1:2],2,2)
+B2 = matrix(c(data.mar2.bottom.up$value[3],0,data.mar2.bottom.up$value[4:5]),2,2)
+Sigma = diag(data.mar2.bottom.up[6:7,]$value) ## Less variability on 
+y_cc_mar2bottomup=matrix(0,100,n_cc)
+x=matrix(0,2,t_max)
+for(nrep in 1:100)
+{
+  ### Initial values
+  x[,1]=xbis[,1]
+  x[,2]=xbis[,2]
+  for (t in 2:(t_max-1))
+  {
+    mu=c(0,0)
+    epsilon=mvrnorm(n = 1, mu, Sigma)
+    x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+  }
+  
+  y_cc_mar2bottomup[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+}
+matplot(c_hat$lag,t(y_cc_mar2bottomup), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - cycles & bottom-up predator dyn.")
+matlines(c_hat$lag,t(y_cc_mar2bottomup))
+lines(c_hat$lag,cc_hat,col="black",lwd=4)
+add_label_legend(label="D",cex=1.5)
+
+### ---- Simulation MAR(2) bottom-up variant model ### 
+B1 = diag(data.mar2.bottom.up$value[1:2],2,2)
+B2 = matrix(c(data.mar2.bottom.up$value[3],0,data.mar2.bottom.up$value[4],0),2,2)
+Sigma = diag(data.mar2.bottom.up[6:7,]$value) ## Less variability on 
+y_cc_mar2bottomup_variant=matrix(0,100,n_cc)
+x=matrix(0,2,t_max)
+for(nrep in 1:100)
+{
+  ### Initial values
+  x[,1]=xbis[,1]
+  x[,2]=xbis[,2]
+  for (t in 2:(t_max-1))
+  {
+    mu=c(0,0)
+    epsilon=mvrnorm(n = 1, mu, Sigma)
+    x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+  }
+  
+  y_cc_mar2bottomup_variant[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+}
+matplot(c_hat$lag,t(y_cc_mar2bottomup_variant), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - bottom-up variant")
+matlines(c_hat$lag,t(y_cc_mar2bottomup_variant))
+lines(c_hat$lag,cc_hat,col="black",lwd=4)
+add_label_legend(label="E",cex=1.5)
+
+### ---- Simulation MAR(2) full model ### 
+data.mar2.full=read.csv(file="mar2/mar2.full.csv")
+B1 = matrix(data.mar2.full$value[1:4],2,2)
+B2 = matrix(data.mar2.full$value[5:8],2,2)
+Sigma = diag(data.mar2.full[9:10,]$value) 
+y_cc_mar2full=matrix(0,100,n_cc)
+x=matrix(0,2,t_max)
+for(nrep in 1:100)
+{
+  ### Initial values
+  x[,1]=xbis[,1]
+  x[,2]=xbis[,2]
+  for (t in 2:(t_max-1))
+  {
+    mu=c(0,0)
+    epsilon=mvrnorm(n = 1, mu, Sigma)
+    x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+  }
+  
+  y_cc_mar2full[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+}
+matplot(c_hat$lag,t(y_cc_mar2full), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - full model")
+matlines(c_hat$lag,t(y_cc_mar2full))
+lines(c_hat$lag,cc_hat,col="black",lwd=4)
+add_label_legend(label="F",cex=1.5)
+
+dev.off()
+#End of cross-correlations for simulations under the fitted models 
+
+#RQ: Should I do the same thing for models with covariates? 
+
+###################################################################################
 ###### 2. Can the models be correctly identified - given the time series length? 
+###################################################################################
 
 ### Simulate the data according to a MAR(1) and see which model fits best
 sim.data=MARSSsimulate(mar1.full, nsim=1, tSteps=100)$sim.data
+# That's another option compared to what I just did above... 
+# Let explicit though. 
 
 ### Other thing
 residuals(mar2.indep.temp)$model.residuals ## why the f** are these 0? 
@@ -1069,7 +1189,7 @@ Q1="diagonal and unequal"
 # Estimation
 model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
 mar1.full.sim=MARSS(xsim[,2:ncol(xsim)], model=model.list)
-MARSSparamCIs(mar1.full.sim) 
+CIs.mar1.full.sim=MARSSparamCIs(mar1.full.sim) 
 
 ### Now MAR(2)
 ### State-space, observation part - never changes 
@@ -1099,6 +1219,7 @@ Q
 ### Model call
 model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
 mar2.full.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
+CIs.mar2.full.sim=MARSSparamCIs(mar2.full.sim)
 
 ### Interaction matrix
 B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
@@ -1108,7 +1229,7 @@ B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
 B
 model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
 mar2.bottom.up.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
-MARSSparamCIs(mar2.bottom.up.sim) 
+CIs.mar2.bottom.up.sim=MARSSparamCIs(mar2.bottom.up.sim) 
 ### MARSSparamCIs(mar2.bottom.up.sim)
 # 
 # MARSS fit is
@@ -1140,7 +1261,7 @@ MARSSaic(mar2.bottom.up.sim, output = "AICbp") ### AIC: 427.4286   AICc: 428.018
 ### This tends to suggest that the bottom-up model is appropriate on the real data - or that we don't know. 
 ### I need to check the coefficients of these models in quite some details. 
 
-############################## check whether the range of values in simulated models are OK ###
+############################## New check: whether the range of values in simulated models are OK ###
 
 ### The data on occupancy was first logged and then standardized
 x2new=(xsim[2,]+m2)*s2
