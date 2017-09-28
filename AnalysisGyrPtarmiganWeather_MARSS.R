@@ -977,7 +977,7 @@ y_cc_mar1null[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation")$acf)
  }
 
 # Start plotting --
-pdf("crossCorrelations_simulatedModels.pdf",height=16,width=10)
+pdf("crossCorrelations_simulatedModels.pdf",height=16,width=12,cex=1.2)
 par(mfrow=c(3,2))#,cex=1.5
 # --- First panel -----
 matplot(c_hat$lag,t(y_cc_mar1null), pch=".",ylab="Cross-correlation",xlab="Time lag",main= "MAR(1) - no interactions")
@@ -1162,12 +1162,12 @@ dev.off()
 ###### 2. Can the models be correctly identified - given the time series length? 
 ###################################################################################
 
+######################### Explo analysis on single time series ############################
 ### Simulate the data according to a MAR(1) and see which model fits best
 sim.data=MARSSsimulate(mar1.full, nsim=1, tSteps=100)$sim.data
-# That's another option compared to what I just did above... 
-# Let explicit though. 
+# We simulate 100 years as a first try. 
 
-### Other thing
+### NB Other thing
 residuals(mar2.indep.temp)$model.residuals ## why the f** are these 0? 
 
 plot(1:100,sim.data[1,,],type="o")
@@ -1236,8 +1236,6 @@ model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
 mar2.bottom.up.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
 CIs.mar2.bottom.up.sim=MARSSparamCIs(mar2.bottom.up.sim) 
 
-
-
 ############### Old results -- different simulation ########################################################"
 ### Warning: takes ages --
 #MARSSaic(mar1.full.sim, output = "AICbp") ### AIC: 410.4315   AICc: 410.8713   AICbp(param): 412.8782 
@@ -1248,6 +1246,7 @@ CIs.mar2.bottom.up.sim=MARSSparamCIs(mar2.bottom.up.sim)
 
 ### This tends to suggest that the bottom-up model is appropriate on the real data - or that we don't know. 
 ### I need to check the coefficients of these models in quite some details. 
+##########################################################################################################
 
 ############################## New check: whether the range of values in simulated models are OK ###
 
@@ -1267,23 +1266,34 @@ new_occupancy2=exp(x2new)
 plot(DGP$Year,DGP$Occupancy,type="b",main="Percentage territories occupied Gyrfalcon")
 plot(new_occupancy2,type="o") ## a bit too high but nothing wrong with the order of magnitude
 plot(new_occupancy2*80,type="o") ## between 60 and 100 birds, nothing crazy. 
+#########################################################################################################
 
-######### Very difficult to differentiate based on those two models. 
-# Ballpark estimate? We have ~ 100 predators, 100 000 prey at best on the study area. 
+#########################################################################################################
+######### Very difficult to differentiate based on those two models - use mechanistic arguments instead?
+# e.g., ballpark estimates?? We have ~ 100 predators, 100 000 prey at best on the study area. 
 # But they decrease at best by 20000 in a single year. So about 200 have to be eaten by predators
 # (we don't count reproduction here, but we do not count death by other causes either)
 # Is this plausible?
 # Would it make more sense to directly formulate a mechanistic model where there is a phenom component for the gyr
 # and a mechanistic model - with predation included - for the ptarmigan. Perhaps based on Erla's models? 
 # Knowing that there is also a lot of hunting, and other predators of ptarmigan. 
+###########################################################################################################
 
-######## Now simulate for only 33 years ############################################
-### Other stuff, e.g. simulate the data according to a MAR(1) and see what happens
-#####################################################################################
+#############################################################################################
+### More formal test: simulate 100 times the data according to a MAR(1) and MAR(2) bottom-up
+### Then evaluate which model fits best most of the time. 
+### Is a scenario (top-down or bottom-up) easier or more difficult to evaluate?
+### Can one be identified with 35 years and another needs 100 - or more? 
+#############################################################################################
+
+######## Now simulate for only 35 years #####################################################
 
 #### Make a figure showing the simulated predator-prey and the simulated bottom-up
-sim.data=MARSSsimulate(mar1.full, nsim=100, tSteps=35)$sim.data
-sim.data2=MARSSsimulate(mar2.bottom.up, nsim=100, tSteps=35)$sim.data
+sim.data=MARSSsimulate(mar1.full, nsim=1000, tSteps=35)$sim.data ### MAR(1) full
+sim.data2=MARSSsimulate(mar2.bottom.up, nsim=1000, tSteps=35)$sim.data ### MAR(2) bottom-up
+
+### Simulated 1000 times because the estimates for 100 repeats were unstable. 
+
 ### Plot both models for two repeats - difficult to tell. 
 pdf("SimulatedModels35ts.pdf",width=6,height=8)
 par(pch=19,cex=1.5,lwd=3,mfrow=c(2,1))
@@ -1295,19 +1305,30 @@ dev.off()
 
 ### Now try fit MAR(1) and MAR(2) to analyze this data
 
-### --- stopped there  // stuff to do to finish the paper and give perspective --- ### 
+# Initializing IC criteria
+AIC_mar1_sim1=AIC_mar2_sim1=AIC_mar1_sim2=AIC_mar2_sim2=NA
+AICc_mar1_sim1=AICc_mar2_sim1=AICc_mar1_sim2=AICc_mar2_sim2=NA
+BIC_mar1_sim1=BIC_mar2_sim1=BIC_mar1_sim2=BIC_mar2_sim2=NA
 
-for (krep in 1:100){ # for all the repeats
+IC_simData_MAR=data.frame(AIC_mar1_sim1,AIC_mar2_sim1,AIC_mar1_sim2,AIC_mar2_sim2,AICc_mar1_sim1,AICc_mar2_sim1,AICc_mar1_sim2,AICc_mar2_sim2,BIC_mar1_sim1,BIC_mar2_sim1,BIC_mar1_sim2,BIC_mar2_sim2)
+
+for (krep in 1:1000){ # for all the repeats
   
-  #Fit MAR(1) model to MAR(1) sim
-  #MAR(1)
+  #Temporary data structure
+  AIC_mar1_sim1=AIC_mar2_sim1=AIC_mar1_sim2=AIC_mar2_sim2=NA
+  AICc_mar1_sim1=AICc_mar2_sim1=AICc_mar1_sim2=AICc_mar2_sim2=NA
+  BIC_mar1_sim1=BIC_mar2_sim1=BIC_mar1_sim2=BIC_mar2_sim2=NA
+  #Store all those in a dataframe
+  IC_simData_MAR_temp=data.frame(AIC_mar1_sim1,AIC_mar2_sim1,AIC_mar1_sim2,AIC_mar2_sim2,AICc_mar1_sim1,AICc_mar2_sim1,AICc_mar1_sim2,AICc_mar2_sim2,BIC_mar1_sim1,BIC_mar2_sim1,BIC_mar1_sim2,BIC_mar2_sim2)
+  
+  ######### 1. Fit MAR(1) model to MAR(1) simulation
+  # MAR(1) definition 
   Z1=diag(1,2)                 ### Diagonal matrix from intrinsic to observed variables
   A1=matrix(list(0,0),2,1)     ### Intercept state space = 0
   R1=matrix(list(0,0,0,0),2,2) ### Error matrix state-space = 0
   ### Initial values
   pi1=matrix(0,2,1); #Initial values
   V1=diag(1,2)
-  
   ### Process model part
   ### Setting matrices
   B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
@@ -1316,10 +1337,13 @@ for (krep in 1:100){ # for all the repeats
   
   # Estimation
   model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
+  xsim=matrix(c(sim.data[1,,krep],sim.data[2,,krep]),nrow=2,byrow=T) ## already defined above
   mar1.full.sim=MARSS(xsim[,2:ncol(xsim)], model=model.list) #MARSSparamCIs(mar1.full.sim) 
-  mar1.full.sim$AIC
+  IC_simData_MAR_temp$AIC_mar1_sim1=mar1.full.sim$AIC
+  IC_simData_MAR_temp$AICc_mar1_sim1=mar1.full.sim$AICc
+  IC_simData_MAR_temp$BIC_mar1_sim1=mar.bic(mar1.full.sim)
   
-  #Fit MAR(2) bottom-up sim to MAR(1) sim
+  ######## 2. Fit MAR(2) bottom-up sim to MAR(1) simulation
   ### State-space, observation part - never changes 
   Z=matrix(c(1,0,0,1,0,0,0,0),2,4) ### Diagonal matrix from intrinsic to observed variables, 0 for delayed variables
   A=matrix(0,2,1)### Intercept state space = 0
@@ -1344,23 +1368,262 @@ for (krep in 1:100){ # for all the repeats
   
   ### Model call
   model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+  #xsim=matrix(c(sim.data[1,,1],sim.data[2,,1]),nrow=2,byrow=T) ## already defined above
   mar2.bottom.up.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
-  MARSSparamCIs(mar2.bottom.up.sim) 
+  ###MARSSparamCIs(mar2.bottom.up.sim) 
+  IC_simData_MAR_temp$AIC_mar2_sim1=mar2.bottom.up.sim$AIC
+  IC_simData_MAR_temp$AICc_mar2_sim1=mar2.bottom.up.sim$AICc
+  IC_simData_MAR_temp$BIC_mar2_sim1=mar.bic(mar2.bottom.up.sim)
   
-  #Fit MAR(1) model to MAR(2) bottom-up sim
+  ######## 3. Fit MAR(1) model to MAR(2) bottom-up sim
+  # MAR(1) definition 
+  Z1=diag(1,2)                 ### Diagonal matrix from intrinsic to observed variables
+  A1=matrix(list(0,0),2,1)     ### Intercept state space = 0
+  R1=matrix(list(0,0,0,0),2,2) ### Error matrix state-space = 0
+  ### Initial values
+  pi1=matrix(0,2,1); #Initial values
+  V1=diag(1,2)
+  ### Process model part
+  ### Setting matrices
+  B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
+  U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
+  Q1="diagonal and unequal"
   
-  #Fit MAR(2) bottom-up sim to MAR(2) sim
+  # Estimation
+  model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
+  xsim2=matrix(c(sim.data2[1,,krep],sim.data2[2,,krep]),nrow=2,byrow=T) ## Put that into a matrix
+  mar1.full.sim2=MARSS(xsim2[,2:ncol(xsim2)], model=model.list) #MARSSparamCIs(mar1.full.sim) 
+  IC_simData_MAR_temp$AIC_mar1_sim2=mar1.full.sim2$AIC
+  IC_simData_MAR_temp$AICc_mar1_sim2=mar1.full.sim2$AICc
+  IC_simData_MAR_temp$BIC_mar1_sim2=mar.bic(mar1.full.sim2)
   
-}
+  ######## 4. Fit MAR(2) bottom-up sim to MAR(2) sim
+  ### State-space, observation part - never changes 
+  Z=matrix(c(1,0,0,1,0,0,0,0),2,4) ### Diagonal matrix from intrinsic to observed variables, 0 for delayed variables
+  A=matrix(0,2,1)### Intercept state space = 0
+  R=matrix(0,2,2) ### Error matrix state-space = 0
+  
+  ### Initial values
+  V=matrix(0,4,4)
+  pi=matrix(c(xsim2[,2],xsim2[,1]),4,1)
+  pi
+  
+  B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
+  B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+  B=matrix(list(0),4,4)
+  B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
+  B
+  
+  ### Process error matrix
+  U=matrix(0,4,1)
+  Q=matrix(list(0),4,4)
+  Q[1,1]="q11"; Q[2,2]="q22"
+  Q
+  
+  ### Model call
+  model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+  #xsim2=matrix(c(sim.data2[1,,1],sim.data2[2,,1]),nrow=2,byrow=T) ## already defined. 
+  mar2.bottom.up.sim2=MARSS(xsim2[,2:ncol(xsim2)],model=model.list.2lags)
+  ###MARSSparamCIs(mar2.bottom.up.sim) 
+  IC_simData_MAR_temp$AIC_mar2_sim2=mar2.bottom.up.sim2$AIC
+  IC_simData_MAR_temp$AICc_mar2_sim2=mar2.bottom.up.sim2$AICc
+  IC_simData_MAR_temp$BIC_mar2_sim2=mar.bic(mar2.bottom.up.sim2)
+  
+  ### Store data
+  if (krep==1){IC_simData_MAR=IC_simData_MAR_temp} else {IC_simData_MAR=rbind(IC_simData_MAR,IC_simData_MAR_temp)}
+} # end of loop on krep
 
+write.csv(format(IC_simData_MAR,digits=4),file="aic.table.simulated.t35.csv")
+### Choice by AIC
+# Proportion of correct assignation of model to sim MAR(1)
+sum(IC_simData_MAR$AIC_mar2_sim1>IC_simData_MAR$AIC_mar1_sim1)/1000
+#0.52
+# Proportion of correct assignation of model to sim MAR(2)
+sum(IC_simData_MAR$AIC_mar1_sim2>IC_simData_MAR$AIC_mar2_sim2)/1000
+#0.984
 
-### Now MAR(2)
+### Choice by AICc
+# Proportion of correct assignation of model to sim MAR(1)
+sum(IC_simData_MAR$AICc_mar2_sim1>IC_simData_MAR$AICc_mar1_sim1)/1000
+#0.565
 
+# Proportion of correct assignation of model to sim MAR(2)
+sum(IC_simData_MAR$AICc_mar1_sim2>IC_simData_MAR$AICc_mar2_sim2)/1000
+#0.981
 
-### Interaction matrix
+### Choice by BIC
+# Proportion of correct assignation of model to sim MAR(1)
+sum(IC_simData_MAR$BIC_mar2_sim1>IC_simData_MAR$BIC_mar1_sim1)/1000
+#0.64
 
+# Proportion of correct assignation of model to sim MAR(2)
+sum(IC_simData_MAR$BIC_mar1_sim2>IC_simData_MAR$BIC_mar2_sim2)/1000
+#0.97
 
+hist(IC_simData_MAR$BIC_mar1_sim2) # just a check
+####################################################################################
+### Exact same analyses with tSim = 100 ############################################
+####################################################################################
 
+#### Make a figure showing the simulated predator-prey and the simulated bottom-up
+sim.data=MARSSsimulate(mar1.full, nsim=100, tSteps=100)$sim.data ### MAR(1) full
+sim.data2=MARSSsimulate(mar2.bottom.up, nsim=100, tSteps=100)$sim.data ### MAR(2) bottom-up
 
+# Initializing IC criteria
+AIC_mar1_sim1=AIC_mar2_sim1=AIC_mar1_sim2=AIC_mar2_sim2=NA
+AICc_mar1_sim1=AICc_mar2_sim1=AICc_mar1_sim2=AICc_mar2_sim2=NA
+BIC_mar1_sim1=BIC_mar2_sim1=BIC_mar1_sim2=BIC_mar2_sim2=NA
 
+IC_simData_MAR=data.frame(AIC_mar1_sim1,AIC_mar2_sim1,AIC_mar1_sim2,AIC_mar2_sim2,AICc_mar1_sim1,AICc_mar2_sim1,AICc_mar1_sim2,AICc_mar2_sim2,BIC_mar1_sim1,BIC_mar2_sim1,BIC_mar1_sim2,BIC_mar2_sim2)
+
+for (krep in 1:100){ # for all the repeats
+  
+  #Temporary data structure
+  AIC_mar1_sim1=AIC_mar2_sim1=AIC_mar1_sim2=AIC_mar2_sim2=NA
+  AICc_mar1_sim1=AICc_mar2_sim1=AICc_mar1_sim2=AICc_mar2_sim2=NA
+  BIC_mar1_sim1=BIC_mar2_sim1=BIC_mar1_sim2=BIC_mar2_sim2=NA
+  #Store all those in a dataframe
+  IC_simData_MAR_temp=data.frame(AIC_mar1_sim1,AIC_mar2_sim1,AIC_mar1_sim2,AIC_mar2_sim2,AICc_mar1_sim1,AICc_mar2_sim1,AICc_mar1_sim2,AICc_mar2_sim2,BIC_mar1_sim1,BIC_mar2_sim1,BIC_mar1_sim2,BIC_mar2_sim2)
+  
+  ######### 1. Fit MAR(1) model to MAR(1) simulation
+  # MAR(1) definition 
+  Z1=diag(1,2)                 ### Diagonal matrix from intrinsic to observed variables
+  A1=matrix(list(0,0),2,1)     ### Intercept state space = 0
+  R1=matrix(list(0,0,0,0),2,2) ### Error matrix state-space = 0
+  ### Initial values
+  pi1=matrix(0,2,1); #Initial values
+  V1=diag(1,2)
+  ### Process model part
+  ### Setting matrices
+  B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
+  U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
+  Q1="diagonal and unequal"
+  
+  # Estimation
+  model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
+  xsim=matrix(c(sim.data[1,,krep],sim.data[2,,krep]),nrow=2,byrow=T) ## already defined above
+  mar1.full.sim=MARSS(xsim[,2:ncol(xsim)], model=model.list) #MARSSparamCIs(mar1.full.sim) 
+  IC_simData_MAR_temp$AIC_mar1_sim1=mar1.full.sim$AIC
+  IC_simData_MAR_temp$AICc_mar1_sim1=mar1.full.sim$AICc
+  IC_simData_MAR_temp$BIC_mar1_sim1=mar.bic(mar1.full.sim)
+  
+  ######## 2. Fit MAR(2) bottom-up sim to MAR(1) simulation
+  ### State-space, observation part - never changes 
+  Z=matrix(c(1,0,0,1,0,0,0,0),2,4) ### Diagonal matrix from intrinsic to observed variables, 0 for delayed variables
+  A=matrix(0,2,1)### Intercept state space = 0
+  R=matrix(0,2,2) ### Error matrix state-space = 0
+  
+  ### Initial values
+  V=matrix(0,4,4)
+  pi=matrix(c(xsim[,2],xsim[,1]),4,1)
+  pi
+  
+  B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
+  B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+  B=matrix(list(0),4,4)
+  B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
+  B
+  
+  ### Process error matrix
+  U=matrix(0,4,1)
+  Q=matrix(list(0),4,4)
+  Q[1,1]="q11"; Q[2,2]="q22"
+  Q
+  
+  ### Model call
+  model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+  #xsim=matrix(c(sim.data[1,,1],sim.data[2,,1]),nrow=2,byrow=T) ## already defined above
+  mar2.bottom.up.sim=MARSS(xsim[,2:ncol(xsim)],model=model.list.2lags)
+  ###MARSSparamCIs(mar2.bottom.up.sim) 
+  IC_simData_MAR_temp$AIC_mar2_sim1=mar2.bottom.up.sim$AIC
+  IC_simData_MAR_temp$AICc_mar2_sim1=mar2.bottom.up.sim$AICc
+  IC_simData_MAR_temp$BIC_mar2_sim1=mar.bic(mar2.bottom.up.sim)
+  
+  ######## 3. Fit MAR(1) model to MAR(2) bottom-up sim
+  # MAR(1) definition 
+  Z1=diag(1,2)                 ### Diagonal matrix from intrinsic to observed variables
+  A1=matrix(list(0,0),2,1)     ### Intercept state space = 0
+  R1=matrix(list(0,0,0,0),2,2) ### Error matrix state-space = 0
+  ### Initial values
+  pi1=matrix(0,2,1); #Initial values
+  V1=diag(1,2)
+  ### Process model part
+  ### Setting matrices
+  B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
+  U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
+  Q1="diagonal and unequal"
+  
+  # Estimation
+  model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
+  xsim2=matrix(c(sim.data2[1,,krep],sim.data2[2,,krep]),nrow=2,byrow=T) ## Put that into a matrix
+  mar1.full.sim2=MARSS(xsim2[,2:ncol(xsim2)], model=model.list) #MARSSparamCIs(mar1.full.sim) 
+  IC_simData_MAR_temp$AIC_mar1_sim2=mar1.full.sim2$AIC
+  IC_simData_MAR_temp$AICc_mar1_sim2=mar1.full.sim2$AICc
+  IC_simData_MAR_temp$BIC_mar1_sim2=mar.bic(mar1.full.sim2)
+  
+  ######## 4. Fit MAR(2) bottom-up sim to MAR(2) sim
+  ### State-space, observation part - never changes 
+  Z=matrix(c(1,0,0,1,0,0,0,0),2,4) ### Diagonal matrix from intrinsic to observed variables, 0 for delayed variables
+  A=matrix(0,2,1)### Intercept state space = 0
+  R=matrix(0,2,2) ### Error matrix state-space = 0
+  
+  ### Initial values
+  V=matrix(0,4,4)
+  pi=matrix(c(xsim2[,2],xsim2[,1]),4,1)
+  pi
+  
+  B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
+  B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+  B=matrix(list(0),4,4)
+  B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
+  B
+  
+  ### Process error matrix
+  U=matrix(0,4,1)
+  Q=matrix(list(0),4,4)
+  Q[1,1]="q11"; Q[2,2]="q22"
+  Q
+  
+  ### Model call
+  model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+  #xsim2=matrix(c(sim.data2[1,,1],sim.data2[2,,1]),nrow=2,byrow=T) ## already defined. 
+  mar2.bottom.up.sim2=MARSS(xsim2[,2:ncol(xsim2)],model=model.list.2lags)
+  ###MARSSparamCIs(mar2.bottom.up.sim) 
+  IC_simData_MAR_temp$AIC_mar2_sim2=mar2.bottom.up.sim2$AIC
+  IC_simData_MAR_temp$AICc_mar2_sim2=mar2.bottom.up.sim2$AICc
+  IC_simData_MAR_temp$BIC_mar2_sim2=mar.bic(mar2.bottom.up.sim2)
+  
+  ### Store data
+  if (krep==1){IC_simData_MAR=IC_simData_MAR_temp} else {IC_simData_MAR=rbind(IC_simData_MAR,IC_simData_MAR_temp)}
+} # end of loop on krep
+
+write.csv(format(IC_simData_MAR,digits=4),file="aic.table.simulated.t100.csv")
+### Choice by AIC
+# Proportion of correct assignation of model to sim MAR(1)
+sum(IC_simData_MAR$AIC_mar2_sim1>IC_simData_MAR$AIC_mar1_sim1)/100
+#0.91
+
+# Proportion of correct assignation of model to sim MAR(2)
+sum(IC_simData_MAR$AIC_mar1_sim2>IC_simData_MAR$AIC_mar2_sim2)/100
+#1
+
+### Choice by AICc
+# Proportion of correct assignation of model to sim MAR(1)
+sum(IC_simData_MAR$AICc_mar2_sim1>IC_simData_MAR$AICc_mar1_sim1)/100
+#0.92
+
+# Proportion of correct assignation of model to sim MAR(2)
+sum(IC_simData_MAR$AICc_mar1_sim2>IC_simData_MAR$AICc_mar2_sim2)/100
+#1
+
+### Choice by BIC
+# Proportion of correct assignation of model to sim MAR(1)
+sum(IC_simData_MAR$BIC_mar2_sim1>IC_simData_MAR$BIC_mar1_sim1)/100
+#0.95
+
+# Proportion of correct assignation of model to sim MAR(2)
+sum(IC_simData_MAR$BIC_mar1_sim2>IC_simData_MAR$BIC_mar2_sim2)/100
+#1
+
+### --- stopped there  // stuff to do to finish the paper and give perspective --- ### 
 
