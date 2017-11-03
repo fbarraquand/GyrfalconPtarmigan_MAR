@@ -1,0 +1,74 @@
+%% LyX 2.1.4 created this file.  For more info, see http://www.lyx.org/.
+%% Do not edit unless you really know what you are doing.
+\documentclass[english]{article}
+\usepackage[T1]{fontenc}
+\usepackage[latin9]{inputenc}
+\usepackage{amstext}
+
+\makeatletter
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% LyX specific LaTeX commands.
+%% Because html converters don't know tabularnewline
+\providecommand{\tabularnewline}{\\}
+
+\makeatother
+
+\usepackage{babel}
+\begin{document}
+\begin{table}
+\begin{centering}
+\begin{tabular}{lllll}
+\hline 
+Parameter  & value & SE & low 95\% CI & up 95\% CI\tabularnewline
+\hline 
+$b_{11}$ &  0.6837 & 0.1169 &  0.4546 & 0.9129\tabularnewline
+$b_{21}$ &  0.2035 & 0.1045 & -0.0013 & 0.4084\tabularnewline
+$b_{12}$ & -0.1999 & 0.1077 & -0.4111 & 0.0113\tabularnewline
+$b_{22}$ &  0.7018 & 0.1044 &  0.4971 & 0.9065\tabularnewline
+$\text{Mean winter temp}_{t+1}$ & \emph{-0.1466} & \emph{0.1210} & \emph{-0.3838} & \emph{0.0906}\tabularnewline
+$\text{Winter precipitation}_{t+1}$ & \emph{-0.1720} & \emph{0.1185} & \emph{-0.4044} & \emph{0.0602}\tabularnewline
+$\text{temperatureApril}_{t-4}$ &  0.2071 & 0.1062 & -0.0010 & 0.4153\tabularnewline
+$\text{rainApril}_{t-4}$ & -0.0557 & 0.1068 & -0.2652 & 0.1537\tabularnewline
+$\sigma_{1}^{2}$ &  0.3635 & 0.0742 &  0.2092 & 0.5602\tabularnewline
+$\sigma_{2}^{2}$ &  0.3422 & 0.0734 &  0.1945 & 0.5314\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\caption{Coefficients for biotic and abiotic effects on population growth.
+Species 1 is ptarmigan and species 2 gyrfalcon. Winter variables only
+affect species 1 while April variables, delayed by 5 years (we model
+the effect of variables at $t-4$ on growth between $t$ and $t+1$),
+affect only species 2's population growth. \label{tab:Estimates_MAR1both_winter}}
+\end{table}
+
+
+\begin{table}
+\begin{centering}
+\begin{tabular}{lllll}
+\hline 
+Parameter  & value & SE & low 95\% CI & up 95\% CI\tabularnewline
+\hline 
+$b_{11}$ &  0.6837 & 0.1169 &  0.4545 & 0.9129\tabularnewline
+$b_{21}$ &  0.2035 & 0.1045 & -0.0013 & 0.4084\tabularnewline
+$b_{12}$ & -0.1999 & 0.1078 & -0.4112 & 0.0113\tabularnewline
+$b_{22}$ &  0.7018 & 0.1044 &  0.4971 & 0.9066\tabularnewline
+$\text{Min Winter temp}_{t+1}$ & \emph{-0.1466} & \emph{0.1210} & \emph{-0.3838} & \emph{0.0906}\tabularnewline
+$\text{Winter precipitation}_{t+1}$ & \emph{-0.1720} & \emph{0.1185} & \emph{-0.4044} & \emph{0.0603}\tabularnewline
+$\text{temperatureApril}_{t-4}$ &  0.2071 & 0.1062 & -0.0010 & 0.4153\tabularnewline
+$\text{rainApril}_{t-4}$ & -0.0557 & 0.1069 & -0.2654 & 0.1539\tabularnewline
+$\sigma_{1}^{2}$ &  0.3635 & 0.0742 &  0.2092 & 0.5602\tabularnewline
+$\sigma_{2}^{2}$ &  0.3422 & 0.0734 &  0.1945 & 0.5314\tabularnewline
+\hline 
+\end{tabular}
+\par\end{centering}
+
+\caption{Coefficients for biotic and abiotic effects on population growth.
+Species 1 is ptarmigan and species 2 gyrfalcon. Winter variables only
+affect species 1 while April variables, delayed by 5 years (we model
+the effect of variables at $t-4$ on growth between $t$ and $t+1$),
+affect only species 2's population growth. \emph{Effects of winter
+variables are depicted in italics. }\label{tab:Estimates_MAR1both_winter2}}
+\end{table}
+
+\end{document}

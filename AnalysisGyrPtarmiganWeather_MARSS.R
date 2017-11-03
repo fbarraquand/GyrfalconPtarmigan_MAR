@@ -11,6 +11,7 @@ graphics.off()
 set.seed(42) # What else?
 options(digits=4)
 
+library(MASS)
 
 ### Reading data on gyr-ptarmigan
 DGP<-read.csv("Gyrfalcon_Data.csv")
@@ -186,6 +187,57 @@ data<-xbis
 model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
 mar1.full=MARSS(data, model=model.list)
 CIs.mar1.full=MARSSparamCIs(mar1.full)
+
+### Produce Fig 1 -- time series with model predictions 
+predict(mar1.full,t.start=1,n.ahead=1) ## why data has only one time point? 
+### OK let's use MARSSsimulate for predictions instead
+
+mar1.full.simu=MARSSsimulate(mar1.full,tSteps = 34, nsim = 50, silent = FALSE,  miss.loc = NULL)
+mar1.full.simu$sim.data
+mar1.full.simu$sim.states
+
+data[,2]
+newdata=mar1.full.simu$sim.states[,1,]
+rowMeans(newdata) ### Problem there? it does not use the original data as starting point for the prediction
+### Otherwise we would have on average the prediction OK with the data? (perhaps not though)
+
+### Plotting the whole thing
+plot(DGP$Year,xbis[1,],type="b",col="red",ylim=c(-3,3),ylab = "Stdized log(population density)",xlab="Year",lwd=3,pch=20)
+lines(DGP$Year,xbis[2,],type="b",lwd=3,pch=20)
+for (k in 1:50){
+points(DGP$Year,mar1.full.simu$sim.states[1,,k],col="red",pch=".")
+points(DGP$Year,mar1.full.simu$sim.states[2,,k],col="black",pch=".")
+}
+
+### Unfortunately these are not one-step ahead prediction, we have to reconstruct everything from scratch
+### We do this below
+B=matrix(mar1.full$par$B,nrow=2)#value=CIs.mar1.full$par$B
+Q=diag(as.vector(mar1.full$par$Q))
+t_max=34
+xsimrepeats=array(data=0,dim=c(2,100,t_max-1))
+mu=c(0,0)
+for (t in 1:(t_max-1))
+{
+    for(nrep in 1:100)
+    {
+    x=xbis
+    epsilon=mvrnorm(n = 1, mu, Q)
+    xnew = B %*% xbis[,t] + epsilon
+    xsimrepeats[,nrep,t] = xnew
+  }
+}
+
+### Plotting the whole thing
+pdf(file = "PredictedLogAbundances.pdf",width=10,height=6)
+par(mfrow=c(1,1),cex=1.5)
+plot(DGP$Year,xbis[1,],type="b",col="black",ylim=c(-3,3),ylab = "Stdized log(population density)",xlab="Year",lwd=3,pch=20)
+lines(DGP$Year,xbis[2,],type="b",col="red",lwd=3,pch=20)
+for (k in 1:50){
+  points(DGP$Year[2:t_max],xsimrepeats[1,k,],col="black",pch=".")
+  points(DGP$Year[2:t_max],xsimrepeats[2,k,],col="red",pch=".")
+}
+dev.off()
+############## End of plotting for Fig. 1 ####################
 
 ### Now include the same full model but with a correlated noise matrix
 Q1=matrix(c("q11","q21","q12","q22"),2,2) ##assume correlated noise
@@ -554,6 +606,7 @@ cntl.list=list(conv.test.slope.tol=0.001,minit=iter_min,maxit=500,abstol=0.001,t
 mar1.both.winter=MARSS(data, model=model.list,control=cntl.list)
 MARSSparamCIs(mar1.both.winter)
 mar1.both.winter$AICc
+CIs.mar1.both.winter=MARSSparamCIs(mar1.both.winter)
 
 covar=t(as.matrix(cbind(avMonthly_tempWinter,log_winter_rain,tempApril_year_minus4,rainApril_year_minus4)))
 C1=matrix(list("minOfMonths_tempWinter","log_winter_rain",0,0,0,0,"tempApril_year_minus4","rainApril_year_minus4"),2,4,byrow=T)
@@ -563,8 +616,58 @@ B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 mar1.both.winter2=MARSS(data, model=model.list)
 MARSSparamCIs(mar1.both.winter2)
+CIs.mar1.both.winter2=MARSSparamCIs(mar1.both.winter2)
 
 #### Check again those models
+value=mar1.both.winter$par$B#value=CIs.mar1.both.winter$par$B
+SE=CIs.mar1.both.winter$par.se$B
+lower=CIs.mar1.both.winter$par.lowCI$B
+upper=CIs.mar1.both.winter$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.both.winter$par$U
+SE=CIs.mar1.both.winter$par.se$U
+lower=CIs.mar1.both.winter$par.lowCI$U
+upper=CIs.mar1.both.winter$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.both.winter$par$Q
+SE=CIs.mar1.both.winter$par.se$Q
+lower=CIs.mar1.both.winter$par.lowCI$Q
+upper=CIs.mar1.both.winter$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.winter.csv")
+
+### Same for model 2
+value=mar1.both.winter2$par$B#value=CIs.mar1.both.winter2$par$B
+SE=CIs.mar1.both.winter2$par.se$B
+lower=CIs.mar1.both.winter2$par.lowCI$B
+upper=CIs.mar1.both.winter2$par.upCI$B
+mar1.data=data.frame(value,SE,lower,upper)
+value=mar1.both.winter2$par$U
+SE=CIs.mar1.both.winter2$par.se$U
+lower=CIs.mar1.both.winter2$par.lowCI$U
+upper=CIs.mar1.both.winter2$par.upCI$U
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+value=mar1.both.winter2$par$Q
+SE=CIs.mar1.both.winter2$par.se$Q
+lower=CIs.mar1.both.winter2$par.lowCI$Q
+upper=CIs.mar1.both.winter2$par.upCI$Q
+mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.winter2.csv")
+
+### AIC Table winter
+
+mar1.both.winter$BIC=mar.bic(mar1.both.winter)
+aic.table=data.frame(mar1.both.winter$logLik,mar1.both.winter$AIC,mar1.both.winter$AICc,mar1.both.winter$BIC)
+names(aic.table)=c("logLik","AIC","AICc","BIC")
+
+mar1.both.winter2$BIC=mar.bic(mar1.both.winter2)
+aic.table.temp=data.frame(mar1.both.winter2$logLik,mar1.both.winter2$AIC,mar1.both.winter2$AICc,mar1.both.winter2$BIC)
+names(aic.table.temp)=c("logLik","AIC","AICc","BIC")
+aic.table=rbind(aic.table,aic.table.temp)
+
+rownames(aic.table)=c("mar1.both.winter","mar1.both.winter2")
+aic.table
+write.csv(format(aic.table,digits=4),file="mar1/aic.table.winter.csv")
 
 #################################################################################################################
 # Now considering MAR(2) models -- what if prey has an impact on the predator but not the other way around ? 

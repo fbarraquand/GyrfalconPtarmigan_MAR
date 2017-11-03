@@ -1,5 +1,5 @@
-#LyX 2.1 created this file. For more info see http://www.lyx.org/
-\lyxformat 474
+#csv2lyx created this file. For more info see http://www.lyx.org/
+\lyxformat 413
 \begin_document
 \begin_header
 \textclass article
@@ -12,13 +12,13 @@
 \font_roman default
 \font_sans default
 \font_typewriter default
-\font_math auto
 \font_default_family default
 \use_non_tex_fonts false
 \font_sc false
 \font_osf false
 \font_sf_scale 100
 \font_tt_scale 100
+
 \graphics default
 \default_output_format default
 \output_sync 0
@@ -28,24 +28,15 @@
 \use_hyperref false
 \papersize default
 \use_geometry false
-\use_package amsmath 1
-\use_package amssymb 1
-\use_package cancel 1
-\use_package esint 1
-\use_package mathdots 1
-\use_package mathtools 1
-\use_package mhchem 1
-\use_package stackrel 1
-\use_package stmaryrd 1
-\use_package undertilde 1
+\use_amsmath 1
+\use_esint 1
+\use_mhchem 1
+\use_mathdots 1
 \cite_engine basic
-\cite_engine_type default
-\biblio_style plain
 \use_bibtopic false
 \use_indices false
 \paperorientation portrait
 \suppress_date false
-\justification true
 \use_refstyle 1
 \index Index
 \shortcut idx
@@ -69,62 +60,56 @@
 \begin_body
 
 \begin_layout Standard
-\begin_inset Float table
-wide false
-sideways false
-status open
-
-\begin_layout Plain Layout
 \begin_inset Tabular
-<lyxtabular version="3" rows="10" columns="5">
-<features rotate="0" tabularvalignment="middle">
+<lyxtabular version="3" rows="11" columns="5">
+<features tabularvalignment="middle">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <column alignment="left" valignment="top" width="0pt">
 <row>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-Model type
+
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-logLikelihood
+value
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-AIC
+SE
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-AICc
+lower
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" topline="true" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-BIC
+upper
 \end_layout
 
 \end_inset
@@ -135,7 +120,7 @@ BIC
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) null
+b11
 \end_layout
 
 \end_inset
@@ -144,7 +129,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
--70.01
+ 0.68379
 \end_layout
 
 \end_inset
@@ -153,7 +138,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-148.0
+0.11693
 \end_layout
 
 \end_inset
@@ -162,7 +147,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-148.7
+ 0.454606
 \end_layout
 
 \end_inset
@@ -171,7 +156,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-154.1
+0.91297
 \end_layout
 
 \end_inset
@@ -182,7 +167,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) null
+b21
 \end_layout
 
 \end_inset
@@ -191,7 +176,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
--66.14
+ 0.20354
 \end_layout
 
 \end_inset
@@ -200,7 +185,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-144.3
+0.10455
 \end_layout
 
 \end_inset
@@ -209,7 +194,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-145.7
+-0.001380
 \end_layout
 
 \end_inset
@@ -218,7 +203,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-153.4
+0.40845
 \end_layout
 
 \end_inset
@@ -229,11 +214,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + May temperature year 
-\begin_inset Formula $t$
-\end_inset
-
-
+b12
 \end_layout
 
 \end_inset
@@ -242,7 +223,7 @@ MAR(1) full + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
--63.98
+-0.19992
 \end_layout
 
 \end_inset
@@ -251,7 +232,7 @@ MAR(1) full + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-144.0
+0.10779
 \end_layout
 
 \end_inset
@@ -260,7 +241,7 @@ MAR(1) full + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-146.4
+-0.411193
 \end_layout
 
 \end_inset
@@ -269,7 +250,7 @@ MAR(1) full + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-156.2
+0.01135
 \end_layout
 
 \end_inset
@@ -280,11 +261,7 @@ MAR(1) full + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) null + May temperature year 
-\begin_inset Formula $t$
-\end_inset
-
-
+b22
 \end_layout
 
 \end_inset
@@ -293,7 +270,7 @@ MAR(1) null + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
--67.03
+ 0.70188
 \end_layout
 
 \end_inset
@@ -302,7 +279,7 @@ MAR(1) null + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-146.1
+0.10445
 \end_layout
 
 \end_inset
@@ -311,7 +288,7 @@ MAR(1) null + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-147.4
+ 0.497171
 \end_layout
 
 \end_inset
@@ -320,7 +297,7 @@ MAR(1) null + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-155.2
+0.90659
 \end_layout
 
 \end_inset
@@ -331,12 +308,7 @@ MAR(1) null + May temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + May temp.
- of year 
-\begin_inset Formula $t-1$
-\end_inset
-
-
+avMonthly_tempWinter
 \end_layout
 
 \end_inset
@@ -345,7 +317,7 @@ MAR(1) full + May temp.
 \begin_inset Text
 
 \begin_layout Plain Layout
--63.94
+-0.14661
 \end_layout
 
 \end_inset
@@ -354,7 +326,7 @@ MAR(1) full + May temp.
 \begin_inset Text
 
 \begin_layout Plain Layout
-143.9
+0.12104
 \end_layout
 
 \end_inset
@@ -363,7 +335,7 @@ MAR(1) full + May temp.
 \begin_inset Text
 
 \begin_layout Plain Layout
-146.3
+-0.383854
 \end_layout
 
 \end_inset
@@ -372,7 +344,7 @@ MAR(1) full + May temp.
 \begin_inset Text
 
 \begin_layout Plain Layout
-156.1
+0.09063
 \end_layout
 
 \end_inset
@@ -383,11 +355,7 @@ MAR(1) full + May temp.
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + May log(rainfall) of 
-\begin_inset Formula $t-1$
-\end_inset
-
-
+log_winter_rain
 \end_layout
 
 \end_inset
@@ -396,7 +364,7 @@ MAR(1) full + May log(rainfall) of
 \begin_inset Text
 
 \begin_layout Plain Layout
--64.89
+-0.17207
 \end_layout
 
 \end_inset
@@ -405,7 +373,7 @@ MAR(1) full + May log(rainfall) of
 \begin_inset Text
 
 \begin_layout Plain Layout
-145.8
+0.11855
 \end_layout
 
 \end_inset
@@ -414,7 +382,7 @@ MAR(1) full + May log(rainfall) of
 \begin_inset Text
 
 \begin_layout Plain Layout
-148.2
+-0.404422
 \end_layout
 
 \end_inset
@@ -423,7 +391,7 @@ MAR(1) full + May log(rainfall) of
 \begin_inset Text
 
 \begin_layout Plain Layout
-158.0
+0.06029
 \end_layout
 
 \end_inset
@@ -434,7 +402,7 @@ MAR(1) full + May log(rainfall) of
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + May temp + log(rainfall) 
+tempApril_year_minus4
 \end_layout
 
 \end_inset
@@ -443,7 +411,7 @@ MAR(1) full + May temp + log(rainfall)
 \begin_inset Text
 
 \begin_layout Plain Layout
--62.81
+ 0.20717
 \end_layout
 
 \end_inset
@@ -452,7 +420,7 @@ MAR(1) full + May temp + log(rainfall)
 \begin_inset Text
 
 \begin_layout Plain Layout
-145.6
+0.10623
 \end_layout
 
 \end_inset
@@ -461,7 +429,7 @@ MAR(1) full + May temp + log(rainfall)
 \begin_inset Text
 
 \begin_layout Plain Layout
-149.5
+-0.001026
 \end_layout
 
 \end_inset
@@ -470,7 +438,7 @@ MAR(1) full + May temp + log(rainfall)
 \begin_inset Text
 
 \begin_layout Plain Layout
-160.9
+0.41538
 \end_layout
 
 \end_inset
@@ -481,11 +449,7 @@ MAR(1) full + May temp + log(rainfall)
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + July temperature year 
-\begin_inset Formula $t-1$
-\end_inset
-
-
+rainApril_year_minus4
 \end_layout
 
 \end_inset
@@ -494,7 +458,7 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
--61.95
+-0.05575
 \end_layout
 
 \end_inset
@@ -503,7 +467,7 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-143.9
+0.10689
 \end_layout
 
 \end_inset
@@ -512,7 +476,7 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-147.8
+-0.265254
 \end_layout
 
 \end_inset
@@ -521,123 +485,107 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-159.2
+0.15376
 \end_layout
 
 \end_inset
 </cell>
 </row>
 <row>
-<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + June temperature effects 
-\begin_inset Formula $t-1$
-\end_inset
-
-
+(X.Y1,X.Y1)
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
--63.79
+ 0.36355
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-147.6
+0.07425
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-151.4
+ 0.209232
 \end_layout
 
 \end_inset
 </cell>
-<cell alignment="left" valignment="top" bottomline="true" usebox="none">
+<cell alignment="left" valignment="top" usebox="none">
 \begin_inset Text
 
 \begin_layout Plain Layout
-162.8
+0.56022
+\end_layout
+
+\end_inset
+</cell>
+</row>
+<row>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+(X.Y2,X.Y2)
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ 0.34225
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.07346
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+ 0.194509
+\end_layout
+
+\end_inset
+</cell>
+<cell alignment="left" valignment="top" usebox="none">
+\begin_inset Text
+
+\begin_layout Plain Layout
+0.53145
 \end_layout
 
 \end_inset
 </cell>
 </row>
 </lyxtabular>
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Plain Layout
-\begin_inset Caption Standard
-
-\begin_layout Plain Layout
-Comparison of model selection criteria for the various MAR(1) models.
- MAR(1) `null' indicates a diagonal 
-\begin_inset Formula $\mathbf{B}$
-\end_inset
-
- matrix while MAR(1) `full' indicates a full 2x2 interaction matrix.
- Models including temperature (third row and below) effects on growth rates
- take the form 
-\begin_inset Formula $\mathbf{x_{t+1}}=\mathbf{a}+\mathbf{Bx_{t}}+\mathbf{Cu_{t}}+\mathbf{e_{t}},\mathbf{e_{t}}\sim\mathcal{N}_{2}(0,\mathbf{\Sigma})$
-\end_inset
-
-.
- Here the environmental vector 
-\begin_inset Formula $\mathbf{u_{t}}=(T_{t-l_{P}},R_{t-l_{P}},T_{t-l_{G}},R_{t-l_{G}})^{T}$
-\end_inset
-
-, with 
-\begin_inset Formula $T$
-\end_inset
-
- the temperature and 
-\begin_inset Formula $R$
-\end_inset
-
- log-rainfall.
- There is a timelag 
-\begin_inset Formula $l_{P}$
-\end_inset
-
- for the ptarmigan (0 or 1 year) and 
-\begin_inset Formula $l_{G}=5$
-\end_inset
-
- for the gyrfalcon: weather is expected to have delayed effects because
- of stage structure in the gyrfalcon population.
- 
-\begin_inset CommandInset label
-LatexCommand label
-name "tab:AICtable_MAR1"
-
-\end_inset
-
-
-\end_layout
-
-\end_inset
-
-
-\end_layout
 
 \end_inset
 

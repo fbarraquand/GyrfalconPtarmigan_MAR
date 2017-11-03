@@ -182,7 +182,7 @@ MAR(1) null
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) null
+MAR(1) full
 \end_layout
 
 \end_inset
@@ -383,7 +383,7 @@ MAR(1) full + May temp.
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + May log(rainfall) of 
+MAR(1) full + May log(precipitation) of 
 \begin_inset Formula $t-1$
 \end_inset
 
@@ -434,7 +434,7 @@ MAR(1) full + May log(rainfall) of
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + May temp + log(rainfall) 
+MAR(1) full + May temp + log(precipitation) 
 \end_layout
 
 \end_inset
@@ -481,11 +481,7 @@ MAR(1) full + May temp + log(rainfall)
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + July temperature year 
-\begin_inset Formula $t-1$
-\end_inset
-
-
+MAR(1) full + Mean Winter temp + mean log(precipitation) 
 \end_layout
 
 \end_inset
@@ -494,7 +490,7 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
--61.95
+-62.72
 \end_layout
 
 \end_inset
@@ -503,7 +499,7 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-143.9
+145.4
 \end_layout
 
 \end_inset
@@ -512,7 +508,7 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-147.8
+149.3
 \end_layout
 
 \end_inset
@@ -521,7 +517,7 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-159.2
+160.7
 \end_layout
 
 \end_inset
@@ -532,11 +528,7 @@ MAR(1) full + July temperature year
 \begin_inset Text
 
 \begin_layout Plain Layout
-MAR(1) full + June temperature effects 
-\begin_inset Formula $t-1$
-\end_inset
-
-
+MAR(1) full + Min Winter temp + mean log(precipitation)
 \end_layout
 
 \end_inset
@@ -545,7 +537,7 @@ MAR(1) full + June temperature effects
 \begin_inset Text
 
 \begin_layout Plain Layout
--63.79
+-62.72
 \end_layout
 
 \end_inset
@@ -554,7 +546,7 @@ MAR(1) full + June temperature effects
 \begin_inset Text
 
 \begin_layout Plain Layout
-147.6
+145.4
 \end_layout
 
 \end_inset
@@ -563,7 +555,7 @@ MAR(1) full + June temperature effects
 \begin_inset Text
 
 \begin_layout Plain Layout
-151.4
+149.3
 \end_layout
 
 \end_inset
@@ -572,7 +564,7 @@ MAR(1) full + June temperature effects
 \begin_inset Text
 
 \begin_layout Plain Layout
-162.8
+160.7
 \end_layout
 
 \end_inset
@@ -586,10 +578,14 @@ MAR(1) full + June temperature effects
 \end_layout
 
 \begin_layout Plain Layout
+
+\end_layout
+
+\begin_layout Plain Layout
 \begin_inset Caption Standard
 
 \begin_layout Plain Layout
-Comparison of model selection criteria for the various MAR(1) models.
+Comparison of model selection criteria for MAR(1) models.
  MAR(1) `null' indicates a diagonal 
 \begin_inset Formula $\mathbf{B}$
 \end_inset
@@ -618,16 +614,15 @@ Comparison of model selection criteria for the various MAR(1) models.
 \begin_inset Formula $l_{P}$
 \end_inset
 
- for the ptarmigan (0 or 1 year) and 
+ for the ptarmigan (0 or 1 year, depending on the month) and 
 \begin_inset Formula $l_{G}=5$
 \end_inset
 
- for the gyrfalcon: weather is expected to have delayed effects because
- of stage structure in the gyrfalcon population.
- 
+ for the gyrfalcon.
+ IC scores for the two winter models are depicted on the last two rows 
 \begin_inset CommandInset label
 LatexCommand label
-name "tab:AICtable_MAR1"
+name "tab:AICtable_MAR1_winter"
 
 \end_inset
 
