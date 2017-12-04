@@ -1080,18 +1080,18 @@ y_cc_mar1null[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation")$acf)
  }
 
 # Start plotting --
-pdf("crossCorrelations_simulatedModels.pdf",height=16,width=12,cex=1.2)
-par(mfrow=c(3,2))#,cex=1.5
+pdf("crossCorrelations_simulatedModels.pdf",height=16,width=16)
+par(mfrow=c(3,2),cex=1.4)#,cex=1.5
 # --- First panel -----
 matplot(c_hat$lag,t(y_cc_mar1null), pch=".",ylab="Cross-correlation",xlab="Time lag",main= "MAR(1) - no interactions")
 matlines(c_hat$lag,t(y_cc_mar1null))
 lines(c_hat$lag,cc_hat,col="black",lwd=4)
-add_label_legend <- function(pos = "topright", label, ...) {
-  legend(pos, label, bty = "n", ...)
+add_label_legend <- function(pos = "topleft", label, ...) {
+  legend(pos, inset=c(-0.2,-0.4), label, bty = "n", xpd=TRUE, ...)
 }
-add_label_legend(label="A",cex=1.5)
+add_label_legend(label="A",cex=1.8)
 #add_label_legend(c(0.9,0.7),label="A")
-add_label_legend(c(0.8,0.6),label="A")
+#add_label_legend(c(0.8,0.6),label="A")
 # --- end of plot on MAR(1) null model --- # 
 
 # --- Extract data from MAR(1) full model --- #
@@ -1149,7 +1149,7 @@ for(nrep in 1:100)
 matplot(c_hat$lag,t(y_cc_mar1full), pch=".",ylab="Cross-correlation",xlab="Time lag",main = "MAR(1) - full interactions")
 matlines(c_hat$lag,t(y_cc_mar1full))
 lines(c_hat$lag,cc_hat,col="black",lwd=4)
-add_label_legend(label="B",cex=1.5)
+add_label_legend(label="B",cex=1.8)
 
 ### ---- Simulation MAR(2) indep model ### 
 data.mar2.indep=read.csv(file="mar2/mar2.indep.csv")
@@ -1176,7 +1176,7 @@ for(nrep in 1:100)
 matplot(c_hat$lag,t(y_cc_mar2indep), pch=".",ylab="Cross-correlation",xlab="Time lag",main = "MAR(2) - no interactions")
 matlines(c_hat$lag,t(y_cc_mar2indep))
 lines(c_hat$lag,cc_hat,col="black",lwd=4)
-add_label_legend(label="C",cex=1.5)
+add_label_legend(label="C",cex=1.8)
 
 ### ---- Simulation MAR(2) bottom-up model ### 
 data.mar2.bottom.up=read.csv(file="mar2/mar2.bottom.up.csv")
@@ -1203,7 +1203,7 @@ for(nrep in 1:100)
 matplot(c_hat$lag,t(y_cc_mar2bottomup), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - cycles & bottom-up predator dyn.")
 matlines(c_hat$lag,t(y_cc_mar2bottomup))
 lines(c_hat$lag,cc_hat,col="black",lwd=4)
-add_label_legend(label="D",cex=1.5)
+add_label_legend(label="D",cex=1.8)
 
 ### ---- Simulation MAR(2) bottom-up variant model ### 
 B1 = diag(data.mar2.bottom.up$value[1:2],2,2)
@@ -1228,7 +1228,7 @@ for(nrep in 1:100)
 matplot(c_hat$lag,t(y_cc_mar2bottomup_variant), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - bottom-up variant")
 matlines(c_hat$lag,t(y_cc_mar2bottomup_variant))
 lines(c_hat$lag,cc_hat,col="black",lwd=4)
-add_label_legend(label="E",cex=1.5)
+add_label_legend(label="E",cex=1.8)
 
 ### ---- Simulation MAR(2) full model ### 
 data.mar2.full=read.csv(file="mar2/mar2.full.csv")
@@ -1254,7 +1254,7 @@ for(nrep in 1:100)
 matplot(c_hat$lag,t(y_cc_mar2full), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - full model")
 matlines(c_hat$lag,t(y_cc_mar2full))
 lines(c_hat$lag,cc_hat,col="black",lwd=4)
-add_label_legend(label="F",cex=1.5)
+add_label_legend(label="F",cex=1.8)
 
 dev.off()
 #End of cross-correlations for simulations under the fitted models 
