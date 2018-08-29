@@ -1,6 +1,4 @@
-# GyrfalconPtarmigan_MAR
-Multivariate autoregressive models applied to gyrfalcon - ptarmigan count time series data.
-Joint project with Olafur Nielsen. 
+# Multivariate autoregressive models applied to gyrfalcon - ptarmigan count time series data.
 
 Companion code and data to *Barraquand F. and Nielsen. O, Predator-prey feedback in a gyrfalcon-ptarmigan system? Ecology and Evolution* 
 
