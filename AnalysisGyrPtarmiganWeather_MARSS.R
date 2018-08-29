@@ -394,7 +394,7 @@ Q1="diagonal and unequal"
 B1=matrix(list("b11","b12","b21","b22"),2,2,byrow = T) ### Interaction matrix
 model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0)
 mar1.rain=MARSS(data, model=model.list)
-MARSSparamCIs(mar1.rain)
+CIs.mar1.rain = MARSSparamCIs(mar1.rain)
 # No effect. 
 
 #Storage full model with effect of (cumulated) rainfall
