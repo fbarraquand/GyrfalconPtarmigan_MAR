@@ -2,6 +2,8 @@
 Multivariate autoregressive models applied to gyrfalcon - ptarmigan count time series data.
 Joint project with Olafur Nielsen. 
 
+Companion code and data to *Barraquand F. and Nielsen. O, Predator-prey feedback in a gyrfalcon-ptarmigan system? Ecology and Evolution* 
+
 * MAR models allow to highlight the interactions between the two species dynamics
 * Using weather data from NE Iceland to infer weather effects on population growth 
 * Two different time lags considered to allow cyclic dynamics to occur independently of the predator-prey feedback

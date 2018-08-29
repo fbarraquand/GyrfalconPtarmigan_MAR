@@ -2,16 +2,13 @@
 ################# Analysis Gyrfalcon-Partmigan-Weather data - MAR modelling with MARSS package #################
 ### FBarraquand 26/03/2017, analyses started 06/07/2015, with O. Nielsen #######################################
 ### Updated version producing all the figures and results of the paper in a reproducible workflow 25/07/2017 ###
-### Cleaned up commments and removed some redundant pieces of code 29/08/2018 ##################################
 ################################################################################################################
 
 ### Initializing
 rm(list=ls())
 graphics.off()
-
 ### Setting the seed to keep the same simulations
 set.seed(42) # What else?
-
 options(digits=4)
 
 library(MASS)
@@ -192,24 +189,27 @@ mar1.full=MARSS(data, model=model.list)
 CIs.mar1.full=MARSSparamCIs(mar1.full)
 
 ### Produce Fig 1 -- time series with model predictions 
+predict(mar1.full,t.start=1,n.ahead=1) ## why data has only one time point? 
+### OK let's use MARSSsimulate for predictions instead
 
-### --- Early trials with MARSSsimulate --- ###
-#mar1.full.simu=MARSSsimulate(mar1.full,tSteps = 34, nsim = 50, silent = FALSE,  miss.loc = NULL)
-#mar1.full.simu$sim.data
-#mar1.full.simu$sim.states
-#data[,2]
-#newdata=mar1.full.simu$sim.states[,1,]
-#rowMeans(newdata) ### Problem there? it does not use the original data as starting point for the prediction
+mar1.full.simu=MARSSsimulate(mar1.full,tSteps = 34, nsim = 50, silent = FALSE,  miss.loc = NULL)
+mar1.full.simu$sim.data
+mar1.full.simu$sim.states
+
+data[,2]
+newdata=mar1.full.simu$sim.states[,1,]
+rowMeans(newdata) ### Problem there? it does not use the original data as starting point for the prediction
 ### Otherwise we would have on average the prediction OK with the data? (perhaps not though)
-### Plotting the whole thing
-#plot(DGP$Year,xbis[1,],type="b",col="red",ylim=c(-3,3),ylab = "Stdized log(population density)",xlab="Year",lwd=3,pch=20)
-#lines(DGP$Year,xbis[2,],type="b",lwd=3,pch=20)
-#for (k in 1:50){
-#points(DGP$Year,mar1.full.simu$sim.states[1,,k],col="red",pch=".")
-#points(DGP$Year,mar1.full.simu$sim.states[2,,k],col="black",pch=".")
-#}
-### --- Unfortunately these are not one-step ahead prediction, we have to reconstruct everything from scratch --- ###
 
+### Plotting the whole thing
+plot(DGP$Year,xbis[1,],type="b",col="red",ylim=c(-3,3),ylab = "Stdized log(population density)",xlab="Year",lwd=3,pch=20)
+lines(DGP$Year,xbis[2,],type="b",lwd=3,pch=20)
+for (k in 1:50){
+points(DGP$Year,mar1.full.simu$sim.states[1,,k],col="red",pch=".")
+points(DGP$Year,mar1.full.simu$sim.states[2,,k],col="black",pch=".")
+}
+
+### Unfortunately these are not one-step ahead prediction, we have to reconstruct everything from scratch
 ### We do this below
 B=matrix(mar1.full$par$B,nrow=2)#value=CIs.mar1.full$par$B
 Q=diag(as.vector(mar1.full$par$Q))
@@ -241,12 +241,13 @@ dev.off()
 
 ### Now include the same full model but with a correlated noise matrix
 Q1=matrix(c("q11","q21","q12","q22"),2,2) ##assume correlated noise
+#model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)#did not work at some point. 
 model.list=list(B=B1,U=U1,Q="unconstrained",Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
 mar1.full2=MARSS(data, model=model.list)
 MARSSparamCIs(mar1.full2)
-
 ### Now we assume a non-correlated matrix is OK. 
 Q1="diagonal and unequal"
+
 ### Now include a null model, diagonal MAR(1) model without interactions
 B1=matrix(list("b11",0,0,"b22"),2,2,byrow = T) ### Interaction matrix
 U1=matrix(0,2,1)                  ### Intercept is zero because data is centered. 
@@ -254,7 +255,7 @@ model.list=list(B=B1,U=U1,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=1)
 mar1.null=MARSS(data, model=model.list)
 CIs.mar1.null=MARSSparamCIs(mar1.null)
 
-### Fit quality
+### Diagnostics
 mar1.null$logLik
 mar1.null$AIC
 mar1.null$AICc
@@ -892,6 +893,12 @@ MARSSparamCIs(mar2.indep.temp)
 # MARSSkem: The soln became unstable and logLik DROPPED.
 #Use control$trace=1 to generate a more detailed error report.
 
+## MARSSkem warnings. Type MARSSinfo() for help.
+## MARSSkem: The soln became unstable and logLik DROPPED.
+### where the hell should I mention control$trace=1 ???
+
+########### Check that --- 
+
 ##################################################################################################
 ###### Compare fit of models
 ##################################################################################################
@@ -906,7 +913,7 @@ mar2.bottom.up$AIC
 mar2.indep$AIC 
 mar1.full.bis$AIC
 mar1.null.bis$AIC
-### They are quite close to each other, but clearly below MAR(1)
+### They are quite close to each other, but clearly below  MAR(1)
 ### T=33
 ### BIC=AIC-2*kparam+kparam*log(T)
 
@@ -947,7 +954,7 @@ rownames(aic.table2)=c("mar1.null.bis","mar1.full.bis","mar2.full","mar2.bottom.
 aic.table2
 write.csv(format(aic.table2,digits=4),file="mar2/aic.table2.csv")
 
-############ Previous estimates using AICb for memory ################################################
+############ Previous estimates #####################################################################
 #MARSSaic(mar2.full, output = "AICbp") ### AIC: 129.5646   AICc: 133.5646   AICbp(param): 143.6595 
 #MARSSaic(mar2.bottom.up, output = "AICbp") ### AIC: 129.8294   AICc: 131.7604   AICbp(param): 137.406   
 #MARSSaic(mar2.indep,output = "AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 133.7121   
@@ -956,25 +963,47 @@ write.csv(format(aic.table2,digits=4),file="mar2/aic.table2.csv")
 #MARSSaic(mar2.indep.temp,output="AICbp") ### AIC: 129.5638   AICc: 130.9876   AICbp(param): 134.6404   
 ######################################################################################################
 
-######################################################################################################
-################# Using VAR to check the model order #################################################
-######################################################################################################
+########################## Note and other analyses ###########"""""""###############################
+#### I'll be tempted to do some Bayesian comparison for the MAR(1), MAR(2) indep and bottom-up, with classical diagonal covariance structure. 
+# - And some fit of models with lm() too
 
+growth_rate_bis = growth_rate[,2:ncol(x)]
+x_current = x[,2:ncol(x)]
+x_delayed =  x[,1:(ncol(x)-1)]
+
+lm1=lm(growth_rate_bis[1,] ~ 0 + x_current[1,]+x_current[2,])# pb
+lm2=lm(growth_rate_bis[2,] ~ 0 + x_current[1,]+x_current[2,])
+
+lm1.delayed=lm(growth_rate_bis[1,] ~ 0 + x_current[1,]+x_current[2,]+x_delayed[1,]+x_delayed[2,])# pb
+lm2.delayed=lm(growth_rate_bis[2,] ~ 0 + x_current[1,]+x_current[2,]+x_delayed[1,]+x_delayed[2,])
+### These have few significant coefficients, but that's perhaps just the TS length. 
+
+### Would it be that the delayed component of lm2 has to be removed?  
+
+AIC(lm1,lm1.delayed)
+BIC(lm1,lm1.delayed)
+AIC(lm2,lm2.delayed)
+BIC(lm2,lm2.delayed)
+
+### BIC favors mostly the MAR(1) here, taking the other species as a covariate. 
+
+################# We use now VAR to check the model order ############################################
 library(vars)
 varpp<-VAR(y=data.frame(t(xbis)), type="none",lag.max=5)
 ## Considering 5 maximum lags and using VAR(p) estimation with "vars" package (MAR(p) in ecology)
 varpp #Yields model order=3
 ### Note this is somewhat consistent with previous results, at least concerning AIC (see below for BIC)
 ## http://raunvisindastofnun.hi.is/sites/raunvisindastofnun.hi.is/files/rh-18-2003.pdf
-# I also tried a lag.max = 20, gives lag 7 -- clearly this is overparameterized (lag.max = 20 is nonsensical here)
+# I also tried a lag.max = 20, gives lag 7
+# clearly this is overparameterized and would need some more work on model selection
 
 ###### Looking at several model selection criteria
 var_order_select=VARselect(y=data.frame(t(xbis)), type="none",lag.max=5)
 var_order_select
 
-### The AIC selects 3 lags and the BIC and HQ, that are generally more conservative, two lags. 
+### The AIC selects 3 lags and the BIC and HQ, that are more conservative, two lags. 
 
-### Do these models see causality in the 2x2 model?
+### Does this fit sees causality in the 2x2 model?
 
 ######## MAR(2) model #################
 varpp2<-VAR(y=data.frame(t(xbis)), p=2, type="none")
@@ -1318,6 +1347,9 @@ CIs.mar2.bottom.up.sim=MARSSparamCIs(mar2.bottom.up.sim)
 ### So here we select quite clearly the right model (here, the MAR(1) model) with AICbp. 
 #############################################################################################################
 
+### This tends to suggest that the bottom-up model is appropriate on the real data - or that we don't know. 
+### I need to check the coefficients of these models in quite some details. 
+##########################################################################################################
 
 ############################## New check: whether the range of values in simulated models are OK ###
 
@@ -1339,6 +1371,16 @@ plot(new_occupancy2,type="o") ## a bit too high but nothing wrong with the order
 plot(new_occupancy2*80,type="o") ## between 60 and 100 birds, nothing crazy. 
 #########################################################################################################
 
+#########################################################################################################
+######### Very difficult to differentiate based on those two models - use mechanistic arguments instead?
+# e.g., ballpark estimates?? We have ~ 100 predators, 100 000 prey at best on the study area. 
+# But they decrease at best by 20000 in a single year. So about 200 have to be eaten by predators
+# (we don't count reproduction here, but we do not count death by other causes either)
+# Is this plausible?
+# Would it make more sense to directly formulate a mechanistic model where there is a phenom component for the gyr
+# and a mechanistic model - with predation included - for the ptarmigan. Perhaps based on Erla's models? 
+# Knowing that there is also a lot of hunting, and other predators of ptarmigan. 
+###########################################################################################################
 
 #############################################################################################
 ### More formal test: simulate 100 times the data according to a MAR(1) and MAR(2) bottom-up
@@ -1346,7 +1388,6 @@ plot(new_occupancy2*80,type="o") ## between 60 and 100 birds, nothing crazy.
 ### Is a scenario (top-down or bottom-up) easier or more difficult to evaluate?
 ### Can one be identified with 35 years and another needs 100 - or more? 
 #############################################################################################
-
 
 ######## Now simulate for only 35 years #####################################################
 
@@ -1523,7 +1564,6 @@ sum(IC_simData_MAR$BIC_mar1_sim2>IC_simData_MAR$BIC_mar2_sim2)/1000
 #0.97
 
 hist(IC_simData_MAR$BIC_mar1_sim2) # just a check
-
 ####################################################################################
 ### Exact same analyses with tSim = 100 ############################################
 ####################################################################################
@@ -1688,5 +1728,5 @@ sum(IC_simData_MAR$BIC_mar2_sim1>IC_simData_MAR$BIC_mar1_sim1)/100
 sum(IC_simData_MAR$BIC_mar1_sim2>IC_simData_MAR$BIC_mar2_sim2)/100
 #1
 
-### analyses stop here ### 
+### --- stopped there  // stuff to do to finish the paper and give perspective --- ### 
 

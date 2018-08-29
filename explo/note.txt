@@ -1,6 +1,11 @@
+FB 29/08/2018 
+
+Made copy before cleaning main analysis file
+
 FB 25/07/2017. 
 
 This folder contains all the preliminary analyses, and a draft of the current analyses in the paper, but with a less reproductible workflow. 
+
 I have considered various softwares, and then decided on MARSS which provided the best trade-off between the ease of model selection and matrix specification. 
 Nothing is wrong with the custom code in JAGS nor the very standardized code in vars though. Simply, model selection in JAGS was difficult (as for all Bayesian analysis) and the model fitting cumbersome while giving always similar results to MARSS. VAR() in vars was useful but I found difficult to tailor it to the specific interaction matrices that we had in mind. 
 
