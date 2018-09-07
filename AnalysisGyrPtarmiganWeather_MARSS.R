@@ -361,7 +361,7 @@ mar1.both=MARSS(data, model=model.list)
 CIs.mar1.both=MARSSparamCIs(mar1.both)
 mar1.both
 
-mar1.data=mar_results(mar1.temp.only,CIs.mar1.temp.only)
+mar1.data=mar_results(mar1.both,CIs.mar1.both)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.csv")
 
 ### First comparison of AICc/BIC for all models 
@@ -370,21 +370,6 @@ mar.bic <- function(my.mar)
   my.mar$BIC=0  
   my.mar$BIC=-2*my.mar$logLik + my.mar$num.params*log(my.mar$samp.size/2)
 }
-
-mar.list=list(mar1.null=mar1.null,mar1.full=mar1.full,mar1.temp=mar1.temp,mar1.temp.only=mar1.temp.only,mar1.temp1=mar1.temp1,mar1.rain=mar1.rain,mar1.both=mar1.both)
-names(mar.list[1]) #check
-
-for (k in 1:length(mar.list)){
-  mar.model=mar.list[k]$AIC
-  mar.model$BIC=mar.bic(mar.model)
-  aic.table.temp=data.frame(mar.model$logLik,mar.model$AIC,mar.model$AICc,mar.model$BIC)
-  if (k==1){
-    aic.table=aic.table.temp
-  } else {
-    aic.table=rbind(aic.table,aic.table.temp)
-  }
-}
-### Can't make that f*** loop work -- mar.model$AIC undefined
 
 ## Initialize
 mar1.null$BIC=mar.bic(mar1.null)
