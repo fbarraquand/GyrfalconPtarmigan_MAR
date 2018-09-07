@@ -273,62 +273,40 @@ CIs.mar1.temp=MARSSparamCIs(mar1.temp)
 ####### Storage of interaction matrices B and environmental matrices C ################
 
 ## function for storage 
-# [to add there when I have the time - at the moment this is not very elegant]
+mar_results <- function(model_name,CIs_model_name){
+  
+  value=model_name$par$B#value=CIs_model_name$par$B
+  SE=CIs_model_name$par.se$B
+  lower=CIs_model_name$par.lowCI$B
+  upper=CIs_model_name$par.upCI$B
+  mar1.results=data.frame(value,SE,lower,upper)
+  
+  value=model_name$par$U ### C is U
+  SE=CIs_model_name$par.se$U
+  lower=CIs_model_name$par.lowCI$U
+  upper=CIs_model_name$par.upCI$U
+  mar1.results=rbind(mar1.results,data.frame(value,SE,lower,upper))
+  
+  value=model_name$par$Q ### C is U
+  SE=CIs_model_name$par.se$Q
+  lower=CIs_model_name$par.lowCI$Q
+  upper=CIs_model_name$par.upCI$Q
+  mar1.results=rbind(mar1.results,data.frame(value,SE,lower,upper))
+  return(mar1.results)
+} 
 
 # Storage full model
-value=mar1.full$par$B#value=CIs.mar1.full$par$B
-SE=CIs.mar1.full$par.se$B
-lower=CIs.mar1.full$par.lowCI$B
-upper=CIs.mar1.full$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.full$par$U ### C is U
-SE=CIs.mar1.full$par.se$U
-lower=CIs.mar1.full$par.lowCI$U
-upper=CIs.mar1.full$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.full$par$Q ### C is U
-SE=CIs.mar1.full$par.se$Q
-lower=CIs.mar1.full$par.lowCI$Q
-upper=CIs.mar1.full$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.full,CIs.mar1.full)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.full.csv")
 
 mar1.null$par$B
 #Storage null model
-value=mar1.null$par$B#value=CIs.mar1.null$par$B
-SE=CIs.mar1.null$par.se$B
-lower=CIs.mar1.null$par.lowCI$B
-upper=CIs.mar1.null$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.null$par$U
-SE=CIs.mar1.null$par.se$U
-lower=CIs.mar1.null$par.lowCI$U
-upper=CIs.mar1.null$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.null$par$Q
-SE=CIs.mar1.null$par.se$Q
-lower=CIs.mar1.null$par.lowCI$Q
-upper=CIs.mar1.null$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.null,CIs.mar1.null)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.null.csv")
 
 mar1.temp$par$B
 #Storage full model with effect of temperature
-value=mar1.temp$par$B#value=CIs.mar1.temp$par$B
-SE=CIs.mar1.temp$par.se$B
-lower=CIs.mar1.temp$par.lowCI$B
-upper=CIs.mar1.temp$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.temp$par$U
-SE=CIs.mar1.temp$par.se$U
-lower=CIs.mar1.temp$par.lowCI$U
-upper=CIs.mar1.temp$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.temp$par$Q
-SE=CIs.mar1.temp$par.se$Q
-lower=CIs.mar1.temp$par.lowCI$Q
-upper=CIs.mar1.temp$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data = mar_results(mar1.temp,CIs.mar1.temp)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.temp.csv")
 
 covar=t(as.matrix(cbind(tempMay_year,tempApril_year_minus4)))
@@ -340,23 +318,8 @@ model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0
 mar1.temp.only=MARSS(data, model=model.list)
 CIs.mar1.temp.only=MARSSparamCIs(mar1.temp.only)
 
-value=mar1.temp.only$par$B#value=CIs.mar1.temp.only$par$B
-SE=CIs.mar1.temp.only$par.se$B
-lower=CIs.mar1.temp.only$par.lowCI$B
-upper=CIs.mar1.temp.only$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.temp.only$par$U
-SE=CIs.mar1.temp.only$par.se$U
-lower=CIs.mar1.temp.only$par.lowCI$U
-upper=CIs.mar1.temp.only$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.temp.only$par$Q
-SE=CIs.mar1.temp.only$par.se$Q
-lower=CIs.mar1.temp.only$par.lowCI$Q
-upper=CIs.mar1.temp.only$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.temp.only,CIs.mar1.temp.only)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.temp.only.csv")
-
 
 ### Delay one more year the temperature for ptarmigan. 
 covar=t(as.matrix(cbind(tempMay_year_minus1,tempApril_year_minus4)))
@@ -369,21 +332,7 @@ mar1.temp1=MARSS(data, model=model.list)
 CIs.mar1.temp1=MARSSparamCIs(mar1.temp1)
 
 #Storage full model with effect of temperature one year delayed
-value=mar1.temp1$par$B#value=CIs.mar1.temp1$par$B
-SE=CIs.mar1.temp1$par.se$B
-lower=CIs.mar1.temp1$par.lowCI$B
-upper=CIs.mar1.temp1$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.temp1$par$U
-SE=CIs.mar1.temp1$par.se$U
-lower=CIs.mar1.temp1$par.lowCI$U
-upper=CIs.mar1.temp1$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.temp1$par$Q
-SE=CIs.mar1.temp1$par.se$Q
-lower=CIs.mar1.temp1$par.lowCI$Q
-upper=CIs.mar1.temp1$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.temp1,CIs.mar1.temp1)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.temp1.csv")
 
 ### Now a model with rainfall
@@ -398,21 +347,7 @@ CIs.mar1.rain = MARSSparamCIs(mar1.rain)
 # No effect. 
 
 #Storage full model with effect of (cumulated) rainfall
-value=mar1.rain$par$B#value=CIs.mar1.rain$par$B
-SE=CIs.mar1.rain$par.se$B
-lower=CIs.mar1.rain$par.lowCI$B
-upper=CIs.mar1.rain$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.rain$par$U
-SE=CIs.mar1.rain$par.se$U
-lower=CIs.mar1.rain$par.lowCI$U
-upper=CIs.mar1.rain$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.rain$par$Q
-SE=CIs.mar1.rain$par.se$Q
-lower=CIs.mar1.rain$par.lowCI$Q
-upper=CIs.mar1.rain$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.rain,CIs.mar1.rain)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.rain.csv")
 
 ### With temperature + rainfall
@@ -426,21 +361,7 @@ mar1.both=MARSS(data, model=model.list)
 CIs.mar1.both=MARSSparamCIs(mar1.both)
 mar1.both
 
-value=mar1.both$par$B#value=CIs.mar1.both$par$B
-SE=CIs.mar1.both$par.se$B
-lower=CIs.mar1.both$par.lowCI$B
-upper=CIs.mar1.both$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.both$par$U
-SE=CIs.mar1.both$par.se$U
-lower=CIs.mar1.both$par.lowCI$U
-upper=CIs.mar1.both$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.both$par$Q
-SE=CIs.mar1.both$par.se$Q
-lower=CIs.mar1.both$par.lowCI$Q
-upper=CIs.mar1.both$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.temp.only,CIs.mar1.temp.only)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.csv")
 
 ### First comparison of AICc/BIC for all models 
@@ -520,21 +441,7 @@ mar1.both.june=MARSS(data, model=model.list)
 CIs.mar1.both.june=MARSSparamCIs(mar1.both.june)
 
 ### Store model with June temperature
-value=mar1.both.june$par$B
-SE=CIs.mar1.both.june$par.se$B
-lower=CIs.mar1.both.june$par.lowCI$B
-upper=CIs.mar1.both.june$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.both.june$par$U
-SE=CIs.mar1.both.june$par.se$U
-lower=CIs.mar1.both.june$par.lowCI$U
-upper=CIs.mar1.both.june$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.both.june$par$Q
-SE=CIs.mar1.both.june$par.se$Q
-lower=CIs.mar1.both.june$par.lowCI$Q
-upper=CIs.mar1.both.june$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.both.june,CIs.mar1.both.june)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.june.csv")
 
 covar=t(as.matrix(cbind(tempJuly_year,rainJuly_year,tempApril_year_minus4,rainApril_year_minus4)))
@@ -546,21 +453,7 @@ model.list=list(B=B1,U=U1,C=C1,c=covar,Q=Q1,Z=Z1,A=A1,R=R1,x0=pi1,V0=V1,tinitx=0
 mar1.both.july=MARSS(data, model=model.list)
 CIs.mar1.both.july=MARSSparamCIs(mar1.both.july)
 
-value=mar1.both.july$par$B
-SE=CIs.mar1.both.july$par.se$B
-lower=CIs.mar1.both.july$par.lowCI$B
-upper=CIs.mar1.both.july$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.both.july$par$U
-SE=CIs.mar1.both.july$par.se$U
-lower=CIs.mar1.both.july$par.lowCI$U
-upper=CIs.mar1.both.july$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.both.july$par$Q
-SE=CIs.mar1.both.july$par.se$Q
-lower=CIs.mar1.both.july$par.lowCI$Q
-upper=CIs.mar1.both.july$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.both.july,CIs.mar1.both.july)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.july.csv")
 
 nrow(aic.table) ## How many models have we now
@@ -618,39 +511,11 @@ MARSSparamCIs(mar1.both.winter2)
 CIs.mar1.both.winter2=MARSSparamCIs(mar1.both.winter2)
 
 #### Check again those models
-value=mar1.both.winter$par$B#value=CIs.mar1.both.winter$par$B
-SE=CIs.mar1.both.winter$par.se$B
-lower=CIs.mar1.both.winter$par.lowCI$B
-upper=CIs.mar1.both.winter$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.both.winter$par$U
-SE=CIs.mar1.both.winter$par.se$U
-lower=CIs.mar1.both.winter$par.lowCI$U
-upper=CIs.mar1.both.winter$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.both.winter$par$Q
-SE=CIs.mar1.both.winter$par.se$Q
-lower=CIs.mar1.both.winter$par.lowCI$Q
-upper=CIs.mar1.both.winter$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.both.winter,CIs.mar1.both.winter)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.winter.csv")
 
 ### Same for model 2
-value=mar1.both.winter2$par$B#value=CIs.mar1.both.winter2$par$B
-SE=CIs.mar1.both.winter2$par.se$B
-lower=CIs.mar1.both.winter2$par.lowCI$B
-upper=CIs.mar1.both.winter2$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar1.both.winter2$par$U
-SE=CIs.mar1.both.winter2$par.se$U
-lower=CIs.mar1.both.winter2$par.lowCI$U
-upper=CIs.mar1.both.winter2$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar1.both.winter2$par$Q
-SE=CIs.mar1.both.winter2$par.se$Q
-lower=CIs.mar1.both.winter2$par.lowCI$Q
-upper=CIs.mar1.both.winter2$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar1.both.winter2,CIs.mar1.both.winter2)
 write.csv(format(mar1.data,digits=4),file="mar1/mar1.both.winter2.csv")
 
 ### AIC Table winter
@@ -735,23 +600,8 @@ CIs.mar2.full=MARSSparamCIs(mar2.full)
 # we don't use stacked_data here, just the abundance data that is "observed at t"
 
 ### Store data
-value=mar2.full$par$B
-SE=CIs.mar2.full$par.se$B
-lower=CIs.mar2.full$par.lowCI$B
-upper=CIs.mar2.full$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar2.full$par$U
-SE=CIs.mar2.full$par.se$U
-lower=CIs.mar2.full$par.lowCI$U
-upper=CIs.mar2.full$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar2.full$par$Q
-SE=CIs.mar2.full$par.se$Q
-lower=CIs.mar2.full$par.lowCI$Q
-upper=CIs.mar2.full$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar2.full,CIs.mar2.full)
 write.csv(format(mar1.data,digits=4),file="mar2/mar2.full.csv")
-
 
 #### Bottom-up model that we highlighted before -- with an effect of prey on predator growth the next year. 
 ### Interaction matrix
@@ -766,21 +616,7 @@ mar2.bottom.up=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags)
 CIs.mar2.bottom.up=MARSSparamCIs(mar2.bottom.up)
 
 ### Store data
-value=mar2.bottom.up$par$B
-SE=CIs.mar2.bottom.up$par.se$B
-lower=CIs.mar2.bottom.up$par.lowCI$B
-upper=CIs.mar2.bottom.up$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar2.bottom.up$par$U
-SE=CIs.mar2.bottom.up$par.se$U
-lower=CIs.mar2.bottom.up$par.lowCI$U
-upper=CIs.mar2.bottom.up$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar2.bottom.up$par$Q
-SE=CIs.mar2.bottom.up$par.se$Q
-lower=CIs.mar2.bottom.up$par.lowCI$Q
-upper=CIs.mar2.bottom.up$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar2.bottom.up,CIs.mar2.bottom.up)
 write.csv(format(mar1.data,digits=4),file="mar2/mar2.bottom.up.csv")
 
 ### Independent AR(2) models
@@ -796,21 +632,7 @@ MARSSparamCIs(mar2.indep)
 CIs.mar2.indep=MARSSparamCIs(mar2.indep)
 
 ### Store data
-value=mar2.indep$par$B
-SE=CIs.mar2.indep$par.se$B
-lower=CIs.mar2.indep$par.lowCI$B
-upper=CIs.mar2.indep$par.upCI$B
-mar1.data=data.frame(value,SE,lower,upper)
-value=mar2.indep$par$U
-SE=CIs.mar2.indep$par.se$U
-lower=CIs.mar2.indep$par.lowCI$U
-upper=CIs.mar2.indep$par.upCI$U
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
-value=mar2.indep$par$Q
-SE=CIs.mar2.indep$par.se$Q
-lower=CIs.mar2.indep$par.lowCI$Q
-upper=CIs.mar2.indep$par.upCI$Q
-mar1.data=rbind(mar1.data,data.frame(value,SE,lower,upper))
+mar1.data=mar_results(mar2.indep,CIs.mar2.indep)
 write.csv(format(mar1.data,digits=4),file="mar2/mar2.indep.csv")
 
 ################### Full MAR(1) with same number of data points // TS length affects AIC ##################
