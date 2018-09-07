@@ -6,6 +6,6 @@ Companion code and data to *Barraquand F. and Nielsen. O, Predator-prey feedback
 * Using weather data from NE Iceland to infer weather effects on population growth 
 * Two different time lags considered to allow cyclic dynamics to occur independently of the predator-prey feedback
 * Two key models, one with predator-prey feedback and one with bottom-up dynamics are considered in detail
-* Models are compared both in terms of fit and from the simulated dynamics they produce
+* Models are compared both in terms of fit and resulting dynamical behaviour (i.e., simulating the fitted models)
 
 
