@@ -1036,8 +1036,8 @@ add_label_legend(label="D",cex=1.8)
 ### ---- Simulation MAR(2) bottom-up variant model ### 
 data.mar2.BUv3=read.csv(file="mar2/mar2.BUv3.csv")
 data.mar2.BUv3
-B1 = matrix(c(data.mar2.BUv2$value[1],0,data.mar2.BUv2$value[2:3]),2,2,byrow = TRUE)
-B2 = matrix(c(data.mar2.BUv2$value[4],0,0,data.mar2.BUv2$value[5]),2,2,byrow=TRUE)
+B1 = matrix(c(data.mar2.BUv3$value[1],0,data.mar2.BUv3$value[2:3]),2,2,byrow = TRUE)
+B2 = matrix(c(data.mar2.BUv3$value[4],0,0,data.mar2.BUv3$value[5]),2,2,byrow=TRUE)
 Sigma = diag(data.mar2.bottom.up[6:7,]$value) ## Less variability on 
 y_cc_mar2bottomup=matrix(0,100,n_cc)
 x=matrix(0,2,t_max)
