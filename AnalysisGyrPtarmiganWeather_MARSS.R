@@ -3,6 +3,7 @@
 ### FBarraquand 26/03/2017, analyses started 06/07/2015, with O. Nielsen #######################################
 ### Updated version producing all the figures and results of the paper in a reproducible workflow 25/07/2017 ###
 ### Cleaned up commments and removed some redundant pieces of code 29/08/2018 ##################################
+### FB 04/03/2020 Adding more bottom-up models and correcting previous error  ##################################
 ################################################################################################################
 
 ### Initializing
@@ -192,25 +193,6 @@ mar1.full=MARSS(data, model=model.list)
 CIs.mar1.full=MARSSparamCIs(mar1.full)
 
 ### Produce Fig 1 -- time series with model predictions 
-
-### --- Early trials with MARSSsimulate --- ###
-#mar1.full.simu=MARSSsimulate(mar1.full,tSteps = 34, nsim = 50, silent = FALSE,  miss.loc = NULL)
-#mar1.full.simu$sim.data
-#mar1.full.simu$sim.states
-#data[,2]
-#newdata=mar1.full.simu$sim.states[,1,]
-#rowMeans(newdata) ### Problem there? it does not use the original data as starting point for the prediction
-### Otherwise we would have on average the prediction OK with the data? (perhaps not though)
-### Plotting the whole thing
-#plot(DGP$Year,xbis[1,],type="b",col="red",ylim=c(-3,3),ylab = "Stdized log(population density)",xlab="Year",lwd=3,pch=20)
-#lines(DGP$Year,xbis[2,],type="b",lwd=3,pch=20)
-#for (k in 1:50){
-#points(DGP$Year,mar1.full.simu$sim.states[1,,k],col="red",pch=".")
-#points(DGP$Year,mar1.full.simu$sim.states[2,,k],col="black",pch=".")
-#}
-### --- Unfortunately these are not one-step ahead prediction, we have to reconstruct everything from scratch --- ###
-
-### We do this below
 B=matrix(mar1.full$par$B,nrow=2)#value=CIs.mar1.full$par$B
 Q=diag(as.vector(mar1.full$par$Q))
 t_max=34
@@ -218,8 +200,8 @@ xsimrepeats=array(data=0,dim=c(2,100,t_max-1))
 mu=c(0,0)
 for (t in 1:(t_max-1))
 {
-    for(nrep in 1:100)
-    {
+  for(nrep in 1:100)
+  {
     x=xbis
     epsilon=mvrnorm(n = 1, mu, Q)
     xnew = B %*% xbis[,t] + epsilon
@@ -590,8 +572,8 @@ write.csv(format(mar1.data,digits=4),file="mar2/mar2.full.csv")
 
 #### Bottom-up model that we highlighted before -- with an effect of prey on predator growth the next year. 
 ### Interaction matrix
-B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
-B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T) 
+B2=matrix(list("b11_2",0,"b21_2","b22_2"),2,2,byrow = T) ## error was here, now corrected
 B=matrix(list(0),4,4)
 B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
 B
@@ -603,6 +585,54 @@ CIs.mar2.bottom.up=MARSSparamCIs(mar2.bottom.up)
 ### Store data
 mar1.data=mar_results(mar2.bottom.up,CIs.mar2.bottom.up)
 write.csv(format(mar1.data,digits=4),file="mar2/mar2.bottom.up.csv")
+
+
+#### Bottom-up model -- more direct effect of prey on predator growth 
+### Interaction matrix
+B1=matrix(list("b11_1",0,"b21_1","b22_1"),2,2,byrow = T) 
+B2=matrix(list("b11_2",0,"b21_2","b22_2"),2,2,byrow = T) 
+B=matrix(list(0),4,4)
+B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
+B
+
+model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+mar2.BUv1=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags)
+CIs.mar2.BUv1=MARSSparamCIs(mar2.BUv1)
+### coefficients make moderate sense (B.b21_1 negative)
+
+### Store data
+mar1.data=mar_results(mar2.BUv1,CIs.mar2.BUv1)
+write.csv(format(mar1.data,digits=4),file="mar2/mar2.BUv1.csv")
+
+### Effect of prey on predator growth of that year and no delayed predator dd
+B1=matrix(list("b11_1",0,"b21_1","b22_1"),2,2,byrow = T) 
+B2=matrix(list("b11_2",0,0,0),2,2,byrow = T) 
+B=matrix(list(0),4,4)
+B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
+B
+
+model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+mar2.BUv2=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags)
+CIs.mar2.BUv2=MARSSparamCIs(mar2.BUv2)
+
+### Store data
+mar1.data=mar_results(mar2.BUv2,CIs.mar2.BUv2)
+write.csv(format(mar1.data,digits=4),file="mar2/mar2.BUv2.csv")
+
+### Effect of prey on predator growth of that year and delayed predator dd
+B1=matrix(list("b11_1",0,"b21_1","b22_1"),2,2,byrow = T) 
+B2=matrix(list("b11_2",0,0,"b22_2"),2,2,byrow = T) 
+B=matrix(list(0),4,4)
+B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
+B
+
+model.list.2lags=list(Z=Z,B=B,U=U,Q=Q,A=A,R=R,x0=pi,V0=V,tinitx=1)
+mar2.BUv3=MARSS(xbis[,2:nrow(DGP)],model=model.list.2lags)
+CIs.mar2.BUv3=MARSSparamCIs(mar2.BUv3)
+
+### Store data
+mar1.data=mar_results(mar2.BUv3,CIs.mar2.BUv3)
+write.csv(format(mar1.data,digits=4),file="mar2/mar2.BUv3.csv")
 
 ### Independent AR(2) models
 B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
@@ -704,12 +734,18 @@ MARSSparamCIs(mar2.indep.temp)
 ##################################################################################################
 mar2.full$AICc
 mar2.bottom.up$AICc
+mar2.BUv1$AICc
+mar2.BUv2$AICc
+mar2.BUv3$AICc
 mar2.indep$AICc 
 mar1.full.bis$AICc
 mar1.null.bis$AICc #even higher, how is it possible when compared to VAR? 
 
 mar2.full$AIC
 mar2.bottom.up$AIC
+mar2.BUv1$AIC
+mar2.BUv2$AIC
+mar2.BUv3$AIC
 mar2.indep$AIC 
 mar1.full.bis$AIC
 mar1.null.bis$AIC
@@ -738,6 +774,21 @@ aic.table2.temp=data.frame(mar2.bottom.up$logLik,mar2.bottom.up$AIC,mar2.bottom.
 names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
 aic.table2=rbind(aic.table2,aic.table2.temp)
 
+mar2.BUv1$BIC=mar.bic(mar2.BUv1)
+aic.table2.temp=data.frame(mar2.BUv1$logLik,mar2.BUv1$AIC,mar2.BUv1$AICc,mar2.BUv1$BIC)
+names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
+aic.table2=rbind(aic.table2,aic.table2.temp)
+
+mar2.BUv2$BIC=mar.bic(mar2.BUv2)
+aic.table2.temp=data.frame(mar2.BUv2$logLik,mar2.BUv2$AIC,mar2.BUv2$AICc,mar2.BUv2$BIC)
+names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
+aic.table2=rbind(aic.table2,aic.table2.temp)
+
+mar2.BUv3$BIC=mar.bic(mar2.BUv3)
+aic.table2.temp=data.frame(mar2.BUv3$logLik,mar2.BUv3$AIC,mar2.BUv3$AICc,mar2.BUv3$BIC)
+names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
+aic.table2=rbind(aic.table2,aic.table2.temp)
+
 mar2.indep$BIC=mar.bic(mar2.indep)
 aic.table2.temp=data.frame(mar2.indep$logLik,mar2.indep$AIC,mar2.indep$AICc,mar2.indep$BIC)
 names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
@@ -748,8 +799,7 @@ aic.table2.temp=data.frame(mar2.indep.temp$logLik,mar2.indep.temp$AIC,mar2.indep
 names(aic.table2.temp)=c("logLik","AIC","AICc","BIC")
 aic.table2=rbind(aic.table2,aic.table2.temp)
 
-
-rownames(aic.table2)=c("mar1.null.bis","mar1.full.bis","mar2.full","mar2.bottom.up","mar2.indep","mar2.indep.temp")
+rownames(aic.table2)=c("mar1.null.bis","mar1.full.bis","mar2.full","mar2.bottom.up","mar2.BUv1","mar2.BUv2","mar2.BUv3","mar2.indep","mar2.indep.temp")
 
 aic.table2
 write.csv(format(aic.table2,digits=4),file="mar2/aic.table2.csv")
@@ -790,8 +840,8 @@ causality(varpp2,cause="X1") ## close to reject the hypothesis of non-GC
 
 ######## MAR(1) model ################# 
 varpp1<-VAR(y=data.frame(t(xbis)), p=1, type="none") 
-causality(varpp1,cause="X2") ## No effect of X2 on X1
-causality(varpp1,cause="X1")
+causality(varpp1,cause="X2") ## reject
+causality(varpp1,cause="X1") ## reject
 # Looks better for causality but that's not the model that's selected... 
 #######################################################################################################
 
@@ -843,19 +893,19 @@ n_cc = length(cc_hat)
 y_cc_mar1null=matrix(0,100,n_cc)
 ### Use 100 values to get a simulation enveloppe 
 x=matrix(0,2,t_max)
- for(nrep in 1:100)
+for(nrep in 1:100)
 {
-### Initial values
-x[,1]=xbis[,1]
-for (t in 1:(t_max-1))
-{
-  mu=c(0,0)
-  epsilon=mvrnorm(n = 1, mu, Sigma)
-  x[,t+1]=B %*% x[,t] + epsilon
+  ### Initial values
+  x[,1]=xbis[,1]
+  for (t in 1:(t_max-1))
+  {
+    mu=c(0,0)
+    epsilon=mvrnorm(n = 1, mu, Sigma)
+    x[,t+1]=B %*% x[,t] + epsilon
+  }
+  
+  y_cc_mar1null[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation")$acf)
 }
-
-y_cc_mar1null[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation")$acf)
- }
 
 # Start plotting --
 pdf("crossCorrelations_simulatedModels.pdf",height=16,width=16)
@@ -960,7 +1010,7 @@ add_label_legend(label="C",cex=1.8)
 data.mar2.bottom.up=read.csv(file="mar2/mar2.bottom.up.csv")
 data.mar2.bottom.up
 B1 = diag(data.mar2.bottom.up$value[1:2],2,2)
-B2 = matrix(c(data.mar2.bottom.up$value[3],0,data.mar2.bottom.up$value[4:5]),2,2)
+B2 = matrix(c(data.mar2.bottom.up$value[3],0,data.mar2.bottom.up$value[4:5]),2,2,byrow=TRUE)
 Sigma = diag(data.mar2.bottom.up[6:7,]$value) ## Less variability on 
 y_cc_mar2bottomup=matrix(0,100,n_cc)
 x=matrix(0,2,t_max)
@@ -984,10 +1034,12 @@ lines(c_hat$lag,cc_hat,col="black",lwd=4)
 add_label_legend(label="D",cex=1.8)
 
 ### ---- Simulation MAR(2) bottom-up variant model ### 
-B1 = diag(data.mar2.bottom.up$value[1:2],2,2)
-B2 = matrix(c(data.mar2.bottom.up$value[3],0,data.mar2.bottom.up$value[4],0),2,2)
+data.mar2.BUv3=read.csv(file="mar2/mar2.BUv3.csv")
+data.mar2.BUv3
+B1 = matrix(c(data.mar2.BUv2$value[1],0,data.mar2.BUv2$value[2:3]),2,2,byrow = TRUE)
+B2 = matrix(c(data.mar2.BUv2$value[4],0,0,data.mar2.BUv2$value[5]),2,2,byrow=TRUE)
 Sigma = diag(data.mar2.bottom.up[6:7,]$value) ## Less variability on 
-y_cc_mar2bottomup_variant=matrix(0,100,n_cc)
+y_cc_mar2bottomup=matrix(0,100,n_cc)
 x=matrix(0,2,t_max)
 for(nrep in 1:100)
 {
@@ -1001,12 +1053,13 @@ for(nrep in 1:100)
     x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
   }
   
-  y_cc_mar2bottomup_variant[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+  y_cc_mar2bottomup[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
 }
-matplot(c_hat$lag,t(y_cc_mar2bottomup_variant), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - bottom-up variant")
-matlines(c_hat$lag,t(y_cc_mar2bottomup_variant))
+matplot(c_hat$lag,t(y_cc_mar2bottomup), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - Bottom-up variant")
+matlines(c_hat$lag,t(y_cc_mar2bottomup))
 lines(c_hat$lag,cc_hat,col="black",lwd=4)
 add_label_legend(label="E",cex=1.8)
+
 
 ### ---- Simulation MAR(2) full model ### 
 data.mar2.full=read.csv(file="mar2/mar2.full.csv")
@@ -1035,6 +1088,176 @@ lines(c_hat$lag,cc_hat,col="black",lwd=4)
 add_label_legend(label="F",cex=1.8)
 
 dev.off()
+# 
+# # Start plotting --
+# pdf("crossCorrelations_simulatedModels_moreBUmodels.pdf",height=20,width=16)
+# par(mfrow=c(3,2),cex=1.4)#,cex=1.5
+# # --- First panel -----
+# 
+# ### ---- Simulation MAR(2) bottom-up model ### 
+# data.mar2.bottom.up=read.csv(file="mar2/mar2.bottom.up.csv")
+# data.mar2.bottom.up
+# B1 = diag(data.mar2.bottom.up$value[1:2],2,2)
+# B2 = matrix(c(data.mar2.bottom.up$value[3],0,data.mar2.bottom.up$value[4:5]),2,2,byrow=TRUE)
+# Sigma = diag(data.mar2.bottom.up[6:7,]$value) ## Less variability on 
+# y_cc_mar2bottomup=matrix(0,100,n_cc)
+# x=matrix(0,2,t_max)
+# for(nrep in 1:100)
+# {
+#   ### Initial values
+#   x[,1]=xbis[,1]
+#   x[,2]=xbis[,2]
+#   for (t in 2:(t_max-1))
+#   {
+#     mu=c(0,0)
+#     epsilon=mvrnorm(n = 1, mu, Sigma)
+#     x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+#   }
+#   
+#   y_cc_mar2bottomup[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+# }
+# matplot(c_hat$lag,t(y_cc_mar2bottomup), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - cycles & bottom-up predator dyn.")
+# matlines(c_hat$lag,t(y_cc_mar2bottomup))
+# lines(c_hat$lag,cc_hat,col="black",lwd=4)
+# add_label_legend(label="A",cex=1.8)
+# 
+# ### ---- Simulation MAR(2) bottom-up variant model ### 
+# B1 = diag(data.mar2.bottom.up.variant1$value[1:2],2,2)
+# B2 = matrix(c(data.mar2.bottom.up$value[3],data.mar2.bottom.up$value[4],0,0),2,2)
+# Sigma = diag(data.mar2.bottom.up[6:7,]$value) ## Less variability on 
+# y_cc_mar2bottomup_variant=matrix(0,100,n_cc)
+# x=matrix(0,2,t_max)
+# for(nrep in 1:100)
+# {
+#   ### Initial values
+#   x[,1]=xbis[,1]
+#   x[,2]=xbis[,2]
+#   for (t in 2:(t_max-1))
+#   {
+#     mu=c(0,0)
+#     epsilon=mvrnorm(n = 1, mu, Sigma)
+#     x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+#   }
+#   
+#   y_cc_mar2bottomup_variant[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+# }
+# matplot(c_hat$lag,t(y_cc_mar2bottomup_variant), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - BU variant 2, b_22^2:=0")
+# matlines(c_hat$lag,t(y_cc_mar2bottomup_variant))
+# lines(c_hat$lag,cc_hat,col="black",lwd=4)
+# add_label_legend(label="B",cex=1.8)
+# 
+# ##### BU variant 1
+# 
+# data.mar2.BUv1=read.csv(file="mar2/mar2.BUv1.csv")
+# data.mar2.BUv1
+# B1 = matrix(c(data.mar2.BUv2$value[1],0,data.mar2.BUv2$value[2:3]),2,2,byrow = T)
+# B2 = matrix(c(data.mar2.BUv2$value[4],0,data.mar2.BUv2$value[5:6]),2,2,byrow = T)
+# Sigma = diag(data.mar2.bottom.up[7:8,]$value) ## Less variability on 
+# y_cc_mar2bottomup=matrix(0,100,n_cc)
+# x=matrix(0,2,t_max)
+# for(nrep in 1:100)
+# {
+#   ### Initial values
+#   x[,1]=xbis[,1]
+#   x[,2]=xbis[,2]
+#   for (t in 2:(t_max-1))
+#   {
+#     mu=c(0,0)
+#     epsilon=mvrnorm(n = 1, mu, Sigma)
+#     x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+#   }
+#   
+#   y_cc_mar2bottomup[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+# }
+# matplot(c_hat$lag,t(y_cc_mar2bottomup), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - BU v1")
+# matlines(c_hat$lag,t(y_cc_mar2bottomup))
+# lines(c_hat$lag,cc_hat,col="black",lwd=4)
+# add_label_legend(label="C",cex=1.8)
+# 
+# 
+# ##### BU variant 2
+# 
+# data.mar2.BUv2=read.csv(file="mar2/mar2.BUv2.csv")
+# data.mar2.BUv2
+# B1 = matrix(c(data.mar2.BUv2$value[1],0,data.mar2.BUv2$value[2:3]),2,2,byrow = T)
+# B2 = matrix(c(data.mar2.BUv2$value[4],0,0,0),2,2,byrow=TRUE)
+# Sigma = diag(data.mar2.bottom.up[5:6,]$value) ## Less variability on 
+# y_cc_mar2bottomup=matrix(0,100,n_cc)
+# x=matrix(0,2,t_max)
+# for(nrep in 1:100)
+# {
+#   ### Initial values
+#   x[,1]=xbis[,1]
+#   x[,2]=xbis[,2]
+#   for (t in 2:(t_max-1))
+#   {
+#     mu=c(0,0)
+#     epsilon=mvrnorm(n = 1, mu, Sigma)
+#     x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+#   }
+#   
+#   y_cc_mar2bottomup[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+# }
+# matplot(c_hat$lag,t(y_cc_mar2bottomup), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - BU v2")
+# matlines(c_hat$lag,t(y_cc_mar2bottomup))
+# lines(c_hat$lag,cc_hat,col="black",lwd=4)
+# add_label_legend(label="D",cex=1.8)
+# 
+# ##### BU variant 3
+# 
+# data.mar2.BUv3=read.csv(file="mar2/mar2.BUv3.csv")
+# data.mar2.BUv3
+# B1 = matrix(c(data.mar2.BUv2$value[1],0,data.mar2.BUv2$value[2:3]),2,2,byrow = T)
+# B2 = matrix(c(data.mar2.BUv2$value[4],0,0,data.mar2.BUv2$value[5]),2,2,byrow=TRUE)
+# Sigma = diag(data.mar2.bottom.up[6:7,]$value) ## Less variability on 
+# y_cc_mar2bottomup=matrix(0,100,n_cc)
+# x=matrix(0,2,t_max)
+# for(nrep in 1:100)
+# {
+#   ### Initial values
+#   x[,1]=xbis[,1]
+#   x[,2]=xbis[,2]
+#   for (t in 2:(t_max-1))
+#   {
+#     mu=c(0,0)
+#     epsilon=mvrnorm(n = 1, mu, Sigma)
+#     x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+#   }
+#   
+#   y_cc_mar2bottomup[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+# }
+# matplot(c_hat$lag,t(y_cc_mar2bottomup), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - BU v3")
+# matlines(c_hat$lag,t(y_cc_mar2bottomup))
+# lines(c_hat$lag,cc_hat,col="black",lwd=4)
+# add_label_legend(label="E",cex=1.8)
+# 
+# ### ---- Simulation MAR(2) full model ### 
+# data.mar2.full=read.csv(file="mar2/mar2.full.csv")
+# B1 = matrix(data.mar2.full$value[1:4],2,2)
+# B2 = matrix(data.mar2.full$value[5:8],2,2)
+# Sigma = diag(data.mar2.full[9:10,]$value) 
+# y_cc_mar2full=matrix(0,100,n_cc)
+# x=matrix(0,2,t_max)
+# for(nrep in 1:100)
+# {
+#   ### Initial values
+#   x[,1]=xbis[,1]
+#   x[,2]=xbis[,2]
+#   for (t in 2:(t_max-1))
+#   {
+#     mu=c(0,0)
+#     epsilon=mvrnorm(n = 1, mu, Sigma)
+#     x[,t+1]=B1 %*% x[,t] +B2 %*% x[,t-1] + epsilon
+#   }
+#   
+#   y_cc_mar2full[nrep,]=as.vector(ccf(x[1,],x[2,],ylab = "cross-correlation",plot=F)$acf)
+# }
+# matplot(c_hat$lag,t(y_cc_mar2full), pch=".",ylab="Cross-correlation",xlab="Time lag",main="MAR(2) - full model")
+# matlines(c_hat$lag,t(y_cc_mar2full))
+# lines(c_hat$lag,cc_hat,col="black",lwd=4)
+# add_label_legend(label="F",cex=1.8)
+# 
+# dev.off()
 #End of cross-correlations for simulations under the fitted models 
 
 #RQ: Should I do the same thing for models with covariates? 
@@ -1129,7 +1352,7 @@ CIs.mar2.bottom.up.sim=MARSSparamCIs(mar2.bottom.up.sim)
 ############################## New check: whether the range of values in simulated models are OK ###
 
 ### The data on occupancy was first logged and then standardized
-x2new=(xsim[2,]+m2)*s2
+x2new=(xsim[2,])*s2+m2
 new_occupancy=exp(x2new)
 
 plot(DGP$Year,DGP$Occupancy,type="b",main="Percentage territories occupied Gyrfalcon")
@@ -1138,7 +1361,7 @@ plot(new_occupancy*80,type="o") ## between 60 and 100 birds, nothing crazy.
 
 sim.data2=MARSSsimulate(mar2.bottom.up, nsim=1, tSteps=100)$sim.data
 xsim2=matrix(c(sim.data2[1,,1],sim.data2[2,,1]),nrow=2,byrow=T) ## Put that into a matrix
-x2new=(xsim2[2,]+m2)*s2
+x2new=(xsim2[2,])*s2+m2
 new_occupancy2=exp(x2new)
 ### Same thing for the bottom-up model
 plot(DGP$Year,DGP$Occupancy,type="b",main="Percentage territories occupied Gyrfalcon")
@@ -1224,7 +1447,7 @@ for (krep in 1:1000){ # for all the repeats
   pi
   
   B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
-  B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+  B2=matrix(list("b11_2",0,"b21_2","b22_2"),2,2,byrow = T) 
   B=matrix(list(0),4,4)
   B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
   B
@@ -1278,7 +1501,7 @@ for (krep in 1:1000){ # for all the repeats
   pi
   
   B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
-  B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+  B2=matrix(list("b11_2",0,"b21_2","b22_2"),2,2,byrow = T) 
   B=matrix(list(0),4,4)
   B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
   B
@@ -1306,28 +1529,34 @@ write.csv(format(IC_simData_MAR,digits=4),file="aic.table.simulated.t35.csv")
 ### Choice by AIC
 # Proportion of correct assignation of model to sim MAR(1)
 sum(IC_simData_MAR$AIC_mar2_sim1>IC_simData_MAR$AIC_mar1_sim1)/1000
-#0.52
+#0.52 # with error
+#0.468     # corrected
 # Proportion of correct assignation of model to sim MAR(2)
 sum(IC_simData_MAR$AIC_mar1_sim2>IC_simData_MAR$AIC_mar2_sim2)/1000
-#0.984
+#0.984 # with error
+# 0.994      # corrected
 
 ### Choice by AICc
 # Proportion of correct assignation of model to sim MAR(1)
 sum(IC_simData_MAR$AICc_mar2_sim1>IC_simData_MAR$AICc_mar1_sim1)/1000
-#0.565
+#0.565 # with error
+#0.511     # corrected
 
 # Proportion of correct assignation of model to sim MAR(2)
 sum(IC_simData_MAR$AICc_mar1_sim2>IC_simData_MAR$AICc_mar2_sim2)/1000
-#0.981
+#0.981 # with error
+#0.993 # corrected
 
 ### Choice by BIC
 # Proportion of correct assignation of model to sim MAR(1)
 sum(IC_simData_MAR$BIC_mar2_sim1>IC_simData_MAR$BIC_mar1_sim1)/1000
-#0.64
+#0.64 # with error
+#0.586 # corrected
 
 # Proportion of correct assignation of model to sim MAR(2)
 sum(IC_simData_MAR$BIC_mar1_sim2>IC_simData_MAR$BIC_mar2_sim2)/1000
-#0.97
+#0.97 # with error
+#0.988 # corrected
 
 hist(IC_simData_MAR$BIC_mar1_sim2) # just a check
 
@@ -1336,8 +1565,8 @@ hist(IC_simData_MAR$BIC_mar1_sim2) # just a check
 ####################################################################################
 
 #### Make a figure showing the simulated predator-prey and the simulated bottom-up
-sim.data=MARSSsimulate(mar1.full, nsim=100, tSteps=100)$sim.data ### MAR(1) full
-sim.data2=MARSSsimulate(mar2.bottom.up, nsim=100, tSteps=100)$sim.data ### MAR(2) bottom-up
+sim.data=MARSSsimulate(mar1.full, nsim=1000, tSteps=100)$sim.data ### MAR(1) full
+sim.data2=MARSSsimulate(mar2.bottom.up, nsim=1000, tSteps=100)$sim.data ### MAR(2) bottom-up
 
 # Initializing IC criteria
 AIC_mar1_sim1=AIC_mar2_sim1=AIC_mar1_sim2=AIC_mar2_sim2=NA
@@ -1346,7 +1575,7 @@ BIC_mar1_sim1=BIC_mar2_sim1=BIC_mar1_sim2=BIC_mar2_sim2=NA
 
 IC_simData_MAR=data.frame(AIC_mar1_sim1,AIC_mar2_sim1,AIC_mar1_sim2,AIC_mar2_sim2,AICc_mar1_sim1,AICc_mar2_sim1,AICc_mar1_sim2,AICc_mar2_sim2,BIC_mar1_sim1,BIC_mar2_sim1,BIC_mar1_sim2,BIC_mar2_sim2)
 
-for (krep in 1:100){ # for all the repeats
+for (krep in 1:1000){ # for all the repeats
   
   #Temporary data structure
   AIC_mar1_sim1=AIC_mar2_sim1=AIC_mar1_sim2=AIC_mar2_sim2=NA
@@ -1389,7 +1618,7 @@ for (krep in 1:100){ # for all the repeats
   pi
   
   B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
-  B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+  B2=matrix(list("b11_2",0,"b21_2","b22_2"),2,2,byrow = T) 
   B=matrix(list(0),4,4)
   B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
   B
@@ -1443,7 +1672,7 @@ for (krep in 1:100){ # for all the repeats
   pi
   
   B1=matrix(list("b11_1",0,0,"b22_1"),2,2,byrow = T)
-  B2=matrix(list("b11_2","b12_2",0,"b22_2"),2,2,byrow = T) 
+  B2=matrix(list("b11_2",0,"b21_2","b22_2"),2,2,byrow = T) 
   B=matrix(list(0),4,4)
   B[1:2,1:2]=B1; B[1:2,3:4]=B2; B[3:4,1:2]=diag(1,2)
   B
@@ -1470,30 +1699,36 @@ for (krep in 1:100){ # for all the repeats
 write.csv(format(IC_simData_MAR,digits=4),file="aic.table.simulated.t100.csv")
 ### Choice by AIC
 # Proportion of correct assignation of model to sim MAR(1)
-sum(IC_simData_MAR$AIC_mar2_sim1>IC_simData_MAR$AIC_mar1_sim1)/100
-#0.91
+sum(IC_simData_MAR$AIC_mar2_sim1>IC_simData_MAR$AIC_mar1_sim1)/1000
+#0.91 # with error
+#0.866 # corrected
 
 # Proportion of correct assignation of model to sim MAR(2)
-sum(IC_simData_MAR$AIC_mar1_sim2>IC_simData_MAR$AIC_mar2_sim2)/100
-#1
+sum(IC_simData_MAR$AIC_mar1_sim2>IC_simData_MAR$AIC_mar2_sim2)/1000
+#1  # with error
+#1 # corrected
 
 ### Choice by AICc
 # Proportion of correct assignation of model to sim MAR(1)
-sum(IC_simData_MAR$AICc_mar2_sim1>IC_simData_MAR$AICc_mar1_sim1)/100
-#0.92
+sum(IC_simData_MAR$AICc_mar2_sim1>IC_simData_MAR$AICc_mar1_sim1)/1000
+#0.92 # with error
+#0.871 # corrected
 
 # Proportion of correct assignation of model to sim MAR(2)
-sum(IC_simData_MAR$AICc_mar1_sim2>IC_simData_MAR$AICc_mar2_sim2)/100
-#1
+sum(IC_simData_MAR$AICc_mar1_sim2>IC_simData_MAR$AICc_mar2_sim2)/1000
+#1 # with error
+#1 # corrected
 
 ### Choice by BIC
 # Proportion of correct assignation of model to sim MAR(1)
-sum(IC_simData_MAR$BIC_mar2_sim1>IC_simData_MAR$BIC_mar1_sim1)/100
-#0.95
+sum(IC_simData_MAR$BIC_mar2_sim1>IC_simData_MAR$BIC_mar1_sim1)/1000
+#0.95 # with error
+#0.937    # corrected
 
 # Proportion of correct assignation of model to sim MAR(2)
-sum(IC_simData_MAR$BIC_mar1_sim2>IC_simData_MAR$BIC_mar2_sim2)/100
-#1
+sum(IC_simData_MAR$BIC_mar1_sim2>IC_simData_MAR$BIC_mar2_sim2)/1000
+#1 # with error
+#0.998 # corrected
 
 ### analyses stop here ### 
 
